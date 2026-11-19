@@ -46,9 +46,17 @@ before it can be completed. Posting the POS sale creates its stock movements
 and accounting move. Reconcile cash sessions as part of the cashier close
 procedure.
 
-The standard Sale Point module is a business workflow, not a finished
-touchscreen cashier design. Direct ESC/POS printing and physical device
-validation are not included in Alif Retail yet.
+The POS sale form has a native GTK scan-code dialog. Connect a USB barcode
+scanner in keyboard-wedge mode, focus the scanner entry, and scan the
+variant's internal SKU or product identifier. A matching active, salable
+variant is added to the current open sale; repeated scans increment the
+quantity on the existing line. Unknown and ambiguous codes are rejected.
+The scanner does not set a price: Tryton calculates the POS price and taxes.
+
+This is a scan-to-cart workflow on Tryton's generic POS form, not yet a
+dedicated touchscreen cashier interface. Direct ESC/POS thermal receipt
+printing, cash-drawer control and physical hardware compatibility tests
+remain outstanding.
 
 Alterations
 -----------
