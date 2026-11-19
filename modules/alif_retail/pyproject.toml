@@ -1,0 +1,52 @@
+[build-system]
+requires = ['hatchling >= 1', 'hatch-tryton']
+build-backend = 'hatchling.build'
+
+[project]
+name = 'trytond_alif_retail'
+dynamic = ['version', 'dependencies', 'optional-dependencies', 'authors', 'readme']
+requires-python = '>=3.10'
+maintainers = [
+    {name = "Alif Growth Media"},
+    ]
+description = "Men's apparel showroom extensions for Tryton"
+license = 'GPL-3.0-or-later'
+license-files = ['LICENSE', 'COPYRIGHT']
+keywords = ["tryton", "retail", "apparel", "showroom"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Plugins",
+    "Framework :: Tryton",
+    "Topic :: Office/Business",
+    "Topic :: Office/Business :: Retail",
+    ]
+
+[project.entry-points.'trytond.modules']
+alif_retail = 'trytond.modules.alif_retail'
+
+[project.urls]
+homepage = "https://github.com/helloalifstudio-coder/tryton"
+repository = "https://github.com/helloalifstudio-coder/tryton"
+
+[tool.hatch.build]
+include = [
+    '**/tryton.cfg',
+    '**/*.py',
+    '**/*.xml',
+    'view/**/*.xml',
+    'locale/**/*.po',
+    'tests/**/*.rst',
+    'tests/**/*.json',
+    ]
+exclude = ['doc']
+
+[tool.hatch.build.targets.wheel.sources]
+"" = "trytond/modules/alif_retail"
+
+[tool.hatch.metadata.hooks.tryton]
+dependencies = []
+copyright = 'COPYRIGHT'
+readme = 'README.rst'
+
+[tool.hatch.metadata.hooks.tryton.tryton-optional-dependencies]
+test = ['proteus']
