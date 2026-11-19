@@ -22,5 +22,14 @@
         <record model="ir.message" id="msg_alteration_sale_line_product_mismatch">
             <field name="text">The linked POS sale line must refer to the same garment.</field>
         </record>
+        <record model="ir.message" id="msg_pos_sale_not_open">
+            <field name="text">Barcode scanning is only available on an open POS sale.</field>
+        </record>
+        <record model="ir.message" id="msg_barcode_unknown">
+            <field name="text">No active salable product variant matches barcode %(code)s.</field>
+        </record>
+        <record model="ir.message" id="msg_barcode_ambiguous">
+            <field name="text">Barcode %(code)s matches more than one product variant. Correct the catalogue before billing.</field>
+        </record>
     </data>
 </tryton>
