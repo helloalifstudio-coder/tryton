@@ -136,6 +136,7 @@ class AlifRetailTestCase(ModuleTestCase):
         sale.on_scan_code("ALIF-SCAN-TEST-001")
         self.assertEqual(len(sale.lines), 1)
         self.assertEqual(sale.lines[0].product, product)
+        self.assertEqual(sale.lines[0].unit, product.sale_uom)
         self.assertEqual(sale.lines[0].quantity, 1)
 
         sale.on_scan_code("ALIF-SCAN-TEST-001")
