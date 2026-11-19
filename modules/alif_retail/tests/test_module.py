@@ -61,7 +61,9 @@ class AlifRetailTestCase(ModuleTestCase):
         Brand = pool.get('alif.retail.brand')
         Collection = pool.get('alif.retail.collection')
         Template = pool.get('product.template')
+        Uom = pool.get('product.uom')
 
+        uom, = Uom.search([], limit=1)
         brand_a, = Brand.create([{
                     'code': 'NB-A',
                     'name': 'Brand A',
@@ -75,12 +77,16 @@ class AlifRetailTestCase(ModuleTestCase):
                     'name': 'Brand B Collection',
                     'brand': brand_b.id,
                     }])
-        template = Template()
-        template.brand = brand_a
-        template.collection = collection
 
         with self.assertRaises(RetailValidationError):
-            Template.validate([template])
+            Template.create([{
+                    'name': 'A Sherwani from Brand A',
+                    'type': 'goods',
+                    'default_uom': uom.id,
+                    'brand': brand_a.id,
+                    'collection': collection.id,
+                    'products': [('create', [{}])],
+                    }])
 
 
 del ModuleTestCase
