@@ -4,6 +4,8 @@
 from datetime import date
 from decimal import Decimal
 
+from lxml import etree
+
 from trytond.exceptions import UserError
 from trytond.model.exceptions import AccessError, ValidationError
 from trytond.pool import Pool
@@ -109,6 +111,18 @@ class AlifRetailTestCase(ModuleTestCase):
         with Transaction().set_user(measurement_user.id):
             record, = Profile.read([profile.id], ['chest_cm'])
             self.assertEqual(record['chest_cm'], Decimal('100.0'))
+
+
+    @with_transaction()
+    def test_pos_form_enables_native_repeat_scanning(self):
+        "The POS form advertises scanner support only while a sale is open."
+        Sale = Pool().get('sale.point.sale')
+        view = Sale.fields_view_get(view_type='form')
+        root = etree.fromstring(view['arch'])
+
+        self.assertEqual(root.get('scan_code'), 'loop')
+        self.assertEqual(root.get('scan_code_depends'), 'lines,state')
+        self.assertTrue(root.get('scan_code_states'))
 
     @with_transaction()
     def test_pos_scanner_adds_and_increments_variant(self):
