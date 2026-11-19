@@ -95,8 +95,9 @@ class MeasurementProfile(ModelSQL, ModelView):
 class AlterationOrder(Workflow, ModelSQL, ModelView):
     "Garment Alteration / Tailoring Order"
     __name__ = 'alif.retail.alteration'
+    _rec_name = 'number'
 
-    number = fields.Char("Order Number", readonly=True)
+    number = fields.Char("Order Number", readonly=True, required=True)
     customer = fields.Many2One(
         'party.party', "Customer", required=True, ondelete='RESTRICT')
     product = fields.Many2One(
@@ -123,6 +124,11 @@ class AlterationOrder(Workflow, ModelSQL, ModelView):
     @classmethod
     def __setup__(cls):
         super().__setup__()
+        table = cls.__table__()
+        cls._sql_constraints += [
+            ('number_unique', Unique(table, table.number),
+                'alif_retail.msg_alteration_number_unique'),
+        ]
         cls._transitions |= {
             ('draft', 'confirmed'),
             ('draft', 'cancelled'),
@@ -161,6 +167,21 @@ class AlterationOrder(Workflow, ModelSQL, ModelView):
     def default_state():
         return 'draft'
 
+    @staticmethod
+    def default_received_on():
+        return Pool().get('ir.date').today()
+
+    @classmethod
+    def preprocess_values(cls, mode, values):
+        values = super().preprocess_values(mode, values)
+        if mode == 'create' and not values.get('number'):
+            ModelData = Pool().get('ir.model.data')
+            Sequence = Pool().get('ir.sequence.strict')
+            sequence_id = ModelData.get_id(
+                'alif_retail', 'sequence_alteration')
+            values['number'] = Sequence(sequence_id).get()
+        return values
+
     @classmethod
     def validate(cls, orders):
         super().validate(orders)
@@ -173,6 +194,10 @@ class AlterationOrder(Workflow, ModelSQL, ModelView):
                     and order.measurement_profile.customer != order.customer):
                 raise ValidationError(gettext(
                     'alif_retail.msg_measurement_customer_mismatch'))
+            if (order.sale_line
+                    and order.sale_line.product != order.product):
+                raise ValidationError(gettext(
+                    'alif_retail.msg_alteration_sale_line_product_mismatch'))
 
     @classmethod
     @ModelView.button
