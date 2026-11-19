@@ -123,11 +123,18 @@ The state flow is open -> done -> posted. The sale must be fully paid before
 it can be completed. Posting creates stock moves for goods and an accounting
 move for sale lines, taxes and payments.
 
-The generic upstream POS does not by itself meet the required cashier
-experience or thermal-printer requirement. The project still needs a fast
-cashier screen, receipt layout and ESC/POS print bridge. Printer failure must
-not repeat a sale: sale posting and print-job execution must be separate,
-idempotent operations.
+The Alif Retail extension adds a native GTK scan-code dialog to the POS
+form. It resolves an exact active, salable product variant by its internal SKU
+or product identifier and adds it to the open sale. Repeated scans increment
+the same variant line. The USB scanner must be configured as a keyboard-wedge
+device; this uses Tryton's existing GTK code-entry dialog, not a custom USB
+protocol implementation.
+
+This remains a scan-to-cart enhancement on the generic POS form, not a
+dedicated touchscreen cashier experience. The project still needs that
+cashier interface, a thermal receipt layout and an ESC/POS print bridge.
+Printer failure must not repeat a sale: sale posting and print-job execution
+must be separate, idempotent operations.
 
 ### Customer orders and tailoring
 
