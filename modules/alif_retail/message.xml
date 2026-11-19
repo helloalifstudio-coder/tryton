@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<tryton>
+    <data>
+        <record model="ir.message" id="msg_brand_code_unique">
+            <field name="text">The brand code must be unique.</field>
+        </record>
+        <record model="ir.message" id="msg_collection_code_unique">
+            <field name="text">The collection code must be unique.</field>
+        </record>
+        <record model="ir.message" id="msg_measurement_must_be_positive">
+            <field name="text">Measurement %(field)s must be greater than zero.</field>
+        </record>
+        <record model="ir.message" id="msg_due_date_before_received">
+            <field name="text">The promised date cannot be earlier than the received date.</field>
+        </record>
+        <record model="ir.message" id="msg_measurement_customer_mismatch">
+            <field name="text">The measurement profile must belong to the selected customer.</field>
+        </record>
+    </data>
+</tryton>
