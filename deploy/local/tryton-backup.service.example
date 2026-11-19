@@ -1,0 +1,15 @@
+[Unit]
+Description=Encrypted Tryton showroom database and filestore backup
+After=postgresql.service trytond.service
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+EnvironmentFile=/etc/trytond/backup.env
+ExecStart=/usr/local/sbin/backup-showroom.sh
+UMask=0077
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/backups/tryton /var/lib/trytond
