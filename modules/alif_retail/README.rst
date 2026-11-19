@@ -20,6 +20,13 @@ Product variants, SKUs, barcodes, inventory quantities, purchase receipts,
 POS sales, payment methods, cash sessions, stock movements and accounting
 entries continue to use upstream Tryton models.
 
+The POS form adds Tryton's native GTK scan-code dialog. A USB barcode scanner
+configured as a keyboard-wedge device can enter the code into that dialog.
+The server resolves the code against a sellable variant SKU or product
+identifier, adds the exact variant to the open POS sale, and increments its
+quantity on repeat scans. Prices and taxes are calculated by the upstream
+POS line model, not supplied by the scanner.
+
 Clothing variant setup
 ----------------------
 
