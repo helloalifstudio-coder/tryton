@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<tree>
+    <field name="customer" expand="1"/>
+    <field name="name"/>
+    <field name="measured_on"/>
+    <field name="active" optional="1"/>
+</tree>
