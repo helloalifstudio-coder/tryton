@@ -47,12 +47,12 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U postgres -d tryton_test"
+          --health-cmd "pg_isready -U postgres -d postgres"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
     env:
-      POSTGRESQL_URI: postgresql://postgres:postgres@127.0.0.1:5432/tryton_test
+      POSTGRESQL_URI: postgresql://postgres:postgres@127.0.0.1:5432/
       DB_NAME: tryton_test
     steps:
       - uses: actions/checkout@v4
