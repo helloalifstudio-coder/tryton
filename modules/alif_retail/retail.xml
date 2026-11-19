@@ -1,0 +1,219 @@
+<?xml version="1.0"?>
+<!-- This file is part of the Alif Retail extension for Tryton. -->
+<tryton>
+    <data>
+        <record model="res.group" id="group_retail_user">
+            <field name="name">Retail User</field>
+        </record>
+        <record model="res.group" id="group_retail_manager">
+            <field name="name">Retail Manager</field>
+        </record>
+        <record model="res.group" id="group_retail_measurements">
+            <field name="name">Customer Measurements</field>
+        </record>
+
+        <record model="ir.ui.view" id="brand_view_form">
+            <field name="model">alif.retail.brand</field>
+            <field name="type">form</field>
+            <field name="name">brand_form</field>
+        </record>
+        <record model="ir.ui.view" id="brand_view_list">
+            <field name="model">alif.retail.brand</field>
+            <field name="type">tree</field>
+            <field name="name">brand_list</field>
+        </record>
+        <record model="ir.action.act_window" id="act_brand">
+            <field name="name">Brands</field>
+            <field name="res_model">alif.retail.brand</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_brand_view_list">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="brand_view_list"/>
+            <field name="act_window" ref="act_brand"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_brand_view_form">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="brand_view_form"/>
+            <field name="act_window" ref="act_brand"/>
+        </record>
+        <menuitem parent="sale.menu_configuration"
+            action="act_brand" sequence="40" id="menu_brand"/>
+
+        <record model="ir.ui.view" id="collection_view_form">
+            <field name="model">alif.retail.collection</field>
+            <field name="type">form</field>
+            <field name="name">collection_form</field>
+        </record>
+        <record model="ir.ui.view" id="collection_view_list">
+            <field name="model">alif.retail.collection</field>
+            <field name="type">tree</field>
+            <field name="name">collection_list</field>
+        </record>
+        <record model="ir.action.act_window" id="act_collection">
+            <field name="name">Collections</field>
+            <field name="res_model">alif.retail.collection</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_collection_view_list">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="collection_view_list"/>
+            <field name="act_window" ref="act_collection"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_collection_view_form">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="collection_view_form"/>
+            <field name="act_window" ref="act_collection"/>
+        </record>
+        <menuitem parent="sale.menu_configuration"
+            action="act_collection" sequence="41" id="menu_collection"/>
+
+        <record model="ir.ui.view" id="measurement_view_form">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="type">form</field>
+            <field name="name">measurement_form</field>
+        </record>
+        <record model="ir.ui.view" id="measurement_view_list">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="type">tree</field>
+            <field name="name">measurement_list</field>
+        </record>
+        <record model="ir.action.act_window" id="act_measurement">
+            <field name="name">Customer Measurements</field>
+            <field name="res_model">alif.retail.measurement.profile</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_measurement_view_list">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="measurement_view_list"/>
+            <field name="act_window" ref="act_measurement"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_measurement_view_form">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="measurement_view_form"/>
+            <field name="act_window" ref="act_measurement"/>
+        </record>
+        <menuitem parent="sale.menu_sale" action="act_measurement"
+            sequence="70" id="menu_measurement"/>
+
+        <record model="ir.ui.view" id="alteration_view_form">
+            <field name="model">alif.retail.alteration</field>
+            <field name="type">form</field>
+            <field name="name">alteration_form</field>
+        </record>
+        <record model="ir.ui.view" id="alteration_view_list">
+            <field name="model">alif.retail.alteration</field>
+            <field name="type">tree</field>
+            <field name="name">alteration_list</field>
+        </record>
+        <record model="ir.action.act_window" id="act_alteration">
+            <field name="name">Alteration Orders</field>
+            <field name="res_model">alif.retail.alteration</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_alteration_view_list">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="alteration_view_list"/>
+            <field name="act_window" ref="act_alteration"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_alteration_view_form">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="alteration_view_form"/>
+            <field name="act_window" ref="act_alteration"/>
+        </record>
+        <menuitem parent="sale.menu_sale" action="act_alteration"
+            sequence="71" id="menu_alteration"/>
+
+        <record model="ir.model.access" id="access_brand_deny">
+            <field name="model">alif.retail.brand</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_brand_user">
+            <field name="model">alif.retail.brand</field>
+            <field name="group" ref="group_retail_user"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_brand_manager">
+            <field name="model">alif.retail.brand</field>
+            <field name="group" ref="group_retail_manager"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+        <record model="ir.model.access" id="access_collection_deny">
+            <field name="model">alif.retail.collection</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_collection_user">
+            <field name="model">alif.retail.collection</field>
+            <field name="group" ref="group_retail_user"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_collection_manager">
+            <field name="model">alif.retail.collection</field>
+            <field name="group" ref="group_retail_manager"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+        <record model="ir.model.access" id="access_measurement_deny">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_measurement_group">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="group" ref="group_retail_measurements"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_measurement_manager">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="group" ref="group_retail_manager"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+
+        <record model="ir.model.access" id="access_alteration_deny">
+            <field name="model">alif.retail.alteration</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_alteration_user">
+            <field name="model">alif.retail.alteration</field>
+            <field name="group" ref="group_retail_user"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_alteration_manager">
+            <field name="model">alif.retail.alteration</field>
+            <field name="group" ref="group_retail_manager"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+    </data>
+</tryton>
