@@ -10,6 +10,7 @@ Type=simple
 User=tryton
 Group=tryton
 WorkingDirectory=/opt/alif-retail
+Environment=HOME=/var/lib/trytond
 EnvironmentFile=/etc/trytond/trytond.env
 ExecStart=/opt/alif-retail/venv/bin/trytond
 Restart=on-failure
