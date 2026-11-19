@@ -141,6 +141,7 @@ class AlifRetailTestCase(ModuleTestCase):
             salable=True,
             sale_uom=unit,
             garment_type='sherwani',
+            gender='men',
         )
         template.save()
         product = Product(template=template)
