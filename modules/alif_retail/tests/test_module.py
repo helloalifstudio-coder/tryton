@@ -100,7 +100,7 @@ class AlifRetailTestCase(ModuleTestCase):
         )
         measurement_user.save()
 
-        with Transaction().set_user(cashier.id):
+        with Transaction().set_context(_check_access=True), Transaction().set_user(cashier.id):
             # The cashier can identify/select the profile for an alteration.
             Profile.read([profile.id], ['name'])
             with self.assertRaises(AccessError):
@@ -108,7 +108,7 @@ class AlifRetailTestCase(ModuleTestCase):
             with self.assertRaises(AccessError):
                 Profile.read([profile.id], ['notes'])
 
-        with Transaction().set_user(measurement_user.id):
+        with Transaction().set_context(_check_access=True), Transaction().set_user(measurement_user.id):
             record, = Profile.read([profile.id], ['chest_cm'])
             self.assertEqual(record['chest_cm'], Decimal('100.0'))
 
