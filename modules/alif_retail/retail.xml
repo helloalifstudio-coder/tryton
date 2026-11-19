@@ -105,6 +105,14 @@
         </record>
         <menuitem parent="sale.menu_sale" action="act_measurement"
             sequence="70" id="menu_measurement"/>
+        <record model="ir.ui.menu-res.group" id="menu_measurement_group_measurements">
+            <field name="menu" ref="menu_measurement"/>
+            <field name="group" ref="group_retail_measurements"/>
+        </record>
+        <record model="ir.ui.menu-res.group" id="menu_measurement_group_manager">
+            <field name="menu" ref="menu_measurement"/>
+            <field name="group" ref="group_retail_manager"/>
+        </record>
 
         <record model="ir.ui.view" id="alteration_view_form">
             <field name="model">alif.retail.alteration</field>
