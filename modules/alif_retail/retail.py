@@ -49,7 +49,7 @@ class Collection(DeactivableMixin, ModelSQL, ModelView):
         cls._order.insert(0, ('name', 'ASC'))
 
 
-class MeasurementProfile(ModelSQL, ModelView):
+class MeasurementProfile(DeactivableMixin, ModelSQL, ModelView):
     "Customer Measurement Profile"
     __name__ = 'alif.retail.measurement.profile'
 
@@ -66,12 +66,6 @@ class MeasurementProfile(ModelSQL, ModelView):
     hip_cm = fields.Numeric("Hip (cm)", digits=(6, 1))
     inseam_cm = fields.Numeric("Inseam (cm)", digits=(6, 1))
     kurta_length_cm = fields.Numeric("Kurta Length (cm)", digits=(6, 1))
-    active = fields.Boolean("Active")
-
-    @staticmethod
-    def default_active():
-        return True
-
     @classmethod
     def __setup__(cls):
         super().__setup__()
