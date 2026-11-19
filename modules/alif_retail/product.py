@@ -15,11 +15,13 @@ class Template(metaclass=PoolMeta):
         'alif.retail.collection', "Collection",
         help="Seasonal or named collection for this garment style.")
     gender = fields.Selection([
+        (None, ""),
         ('men', "Men"),
         ('boys', "Boys"),
         ('unisex', "Unisex"),
         ], "Audience")
     garment_type = fields.Selection([
+        (None, ""),
         ('kurta_pyjama', "Kurta Pyjama"),
         ('pathani', "Pathani"),
         ('sherwani', "Sherwani"),
