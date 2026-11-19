@@ -11,7 +11,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}""]
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
       interval: 10s
       timeout: 5s
       retries: 12
@@ -32,11 +32,13 @@ services:
     environment:
       DB_HOSTNAME: postgres
       DB_PORT: "5432"
+      DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       PASSWORD: ${TRYTON_ADMIN_PASSWORD}
       EMAIL: ${TRYTON_ADMIN_EMAIL}
       TRYTOND_WEB__LISTEN: "0.0.0.0:8000"
+      TRYTOND_DATABASE__LIST: "False"
     ports:
       - "${TRYTON_BIND_ADDRESS:-127.0.0.1}:8000:8000"
     volumes:
@@ -53,11 +55,12 @@ services:
     image: ${APP_IMAGE:-alif-showroom:8.0-lts}
     restart: unless-stopped
     depends_on:
-      server:
-        condition: service_started
+      postgres:
+        condition: service_healthy
     environment:
       DB_HOSTNAME: postgres
       DB_PORT: "5432"
+      DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
     volumes:
@@ -75,10 +78,14 @@ services:
     environment:
       DB_HOSTNAME: postgres
       DB_PORT: "5432"
+      DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       PASSWORD: ${TRYTON_ADMIN_PASSWORD}
       EMAIL: ${TRYTON_ADMIN_EMAIL}
+      TRYTOND_DATABASE__LIST: "False"
+    volumes:
+      - tryton-filestore:/var/lib/trytond/db
     command: ["trytond-admin", "-d", "${DB_NAME}", "--all"]
 
 volumes:
