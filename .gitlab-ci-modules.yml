@@ -938,6 +938,23 @@ test-modules-account_tax_rule_country-postgresql:
     PACKAGE: modules/account_tax_rule_country
     TAG_PATTERN: '/^account_tax_rule_country-.*/'
 
+check-doc-modules-alif_retail:
+  extends: .check-doc
+  variables:
+    PACKAGE: modules/alif_retail
+
+test-modules-alif_retail-sqlite:
+  extends: .test-sqlite
+  variables:
+    PACKAGE: modules/alif_retail
+    TAG_PATTERN: '/^alif_retail-.*/'
+
+test-modules-alif_retail-postgresql:
+  extends: .test-postgresql
+  variables:
+    PACKAGE: modules/alif_retail
+    TAG_PATTERN: '/^alif_retail-.*/'
+
 check-doc-modules-analytic_account:
   extends: .check-doc
   variables:
