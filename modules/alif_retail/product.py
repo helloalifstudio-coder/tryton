@@ -2,9 +2,12 @@
 # Copyright (C) 2026 Alif Growth Media
 # Licensed under the GNU General Public License v3 or later.
 
+from trytond.i18n import gettext
 from trytond.model import fields
 from trytond.pool import PoolMeta
 from trytond.pyson import Eval
+
+from .exceptions import RetailValidationError
 
 
 class Template(metaclass=PoolMeta):
@@ -51,3 +54,15 @@ class Template(metaclass=PoolMeta):
             ('custom', "Custom"),
             ], "Fit")
     care_instructions = fields.Text("Care Instructions")
+
+    @classmethod
+    def validate(cls, templates):
+        super().validate(templates)
+        for template in templates:
+            if (template.collection and template.brand
+                    and template.collection.brand != template.brand):
+                raise RetailValidationError(gettext(
+                        'alif_retail.msg_collection_brand_mismatch'))
+            if template.collection and not template.brand:
+                raise RetailValidationError(gettext(
+                        'alif_retail.msg_collection_brand_required'))

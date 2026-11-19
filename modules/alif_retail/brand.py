@@ -2,7 +2,10 @@
 # Copyright (C) 2026 Alif Growth Media
 # Licensed under the GNU General Public License v3 or later.
 
+from trytond.i18n import gettext
 from trytond.model import DeactivableMixin, ModelSQL, ModelView, Unique, fields
+
+from .exceptions import RetailValidationError
 
 
 class Brand(DeactivableMixin, ModelSQL, ModelView):
@@ -32,7 +35,7 @@ class Collection(DeactivableMixin, ModelSQL, ModelView):
     code = fields.Char("Code", required=True, strip=True)
     name = fields.Char("Name", required=True, translate=True)
     brand = fields.Many2One(
-        'alif.retail.brand', "Brand", ondelete='RESTRICT')
+        'alif.retail.brand', "Brand", required=True, ondelete='RESTRICT')
     season = fields.Selection([
             (None, ''),
             ('year_round', "Year Round"),
@@ -53,3 +56,12 @@ class Collection(DeactivableMixin, ModelSQL, ModelView):
                 'alif_retail.msg_collection_code_unique'),
             ]
         cls._order.insert(0, ('name', 'ASC'))
+
+    @classmethod
+    def validate(cls, collections):
+        super().validate(collections)
+        for collection in collections:
+            if (collection.start_date and collection.end_date
+                    and collection.start_date > collection.end_date):
+                raise RetailValidationError(gettext(
+                        'alif_retail.msg_collection_dates'))
