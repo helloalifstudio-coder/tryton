@@ -4,10 +4,9 @@
 
 import datetime
 
+from trytond.modules.alif_retail.exceptions import RetailValidationError
 from trytond.pool import Pool
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
-
-from trytond.modules.alif_retail.exceptions import RetailValidationError
 
 
 class AlifRetailTestCase(ModuleTestCase):

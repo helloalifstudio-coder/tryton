@@ -8,11 +8,13 @@ on:
     paths:
       - "modules/alif_retail/**"
       - "deploy/docker/**"
+      - "scripts/backup-local.sh"
       - ".github/workflows/alif-retail.yml"
   pull_request:
     paths:
       - "modules/alif_retail/**"
       - "deploy/docker/**"
+      - "scripts/backup-local.sh"
       - ".github/workflows/alif-retail.yml"
 
 permissions:
