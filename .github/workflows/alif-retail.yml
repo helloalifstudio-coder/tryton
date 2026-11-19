@@ -7,10 +7,12 @@ on:
       - "release/8.0-lts"
     paths:
       - "modules/alif_retail/**"
+      - "deploy/docker/**"
       - ".github/workflows/alif-retail.yml"
   pull_request:
     paths:
       - "modules/alif_retail/**"
+      - "deploy/docker/**"
       - ".github/workflows/alif-retail.yml"
 
 permissions:
@@ -18,7 +20,7 @@ permissions:
 
 jobs:
   module:
-    name: Python ${{ matrix.python-version }}
+    name: Module tests · Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -54,3 +56,31 @@ jobs:
 
       - name: Build wheel
         run: python -m build --wheel modules/alif_retail
+
+  container:
+    name: Local deployment image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate Compose configuration
+        run: |
+          docker compose --env-file deploy/docker/.env.example \
+            -f deploy/docker/compose.yml config --quiet
+
+      - name: Build showroom server image
+        run: |
+          docker build --pull \
+            --build-arg TRYTON_BASE_IMAGE=tryton/tryton:8.0 \
+            --file deploy/docker/Dockerfile \
+            --tag alif-showroom:ci .
+
+      - name: Verify custom module is registered in the image
+        run: |
+          docker run --rm --entrypoint python3 alif-showroom:ci -c '
+          from importlib.metadata import entry_points
+          modules = {entry.name: entry.value
+                     for entry in entry_points(group="trytond.modules")}
+          assert "alif_retail" in modules, modules
+          print("alif_retail entry point:", modules["alif_retail"])
+          '
