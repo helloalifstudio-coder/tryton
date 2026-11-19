@@ -1,0 +1,37 @@
+[Unit]
+Description=Tryton ERP application server
+Documentation=https://docs.tryton.org/server/
+After=network-online.target postgresql.service
+Wants=network-online.target
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=tryton
+Group=tryton
+WorkingDirectory=/opt/alif-retail
+EnvironmentFile=/etc/trytond/trytond.env
+ExecStart=/opt/alif-retail/venv/bin/trytond
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=60
+KillSignal=SIGTERM
+UMask=0077
+
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+ReadWritePaths=/var/lib/trytond /var/log/trytond
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
