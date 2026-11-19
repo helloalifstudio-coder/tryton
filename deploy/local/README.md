@@ -85,6 +85,83 @@ hostname and port 8000, then sign in with an individual named account.
 The native GTK client is the intended staff interface. Do not configure
 cashiers to use the SAO browser client for this desktop-only deployment.
 
+## Run the server under systemd
+
+After installing the source in `/opt/alif-retail` and creating the `tryton`
+service account, prepare the writable data directories:
+
+    sudo install -d -o tryton -g tryton -m 0750 /var/lib/trytond
+    sudo install -d -o root -g tryton -m 0750 /etc/trytond
+    sudo install -d -o root -g root -m 0750 /var/log/trytond
+
+Copy `trytond.env.example` to `/etc/trytond/trytond.env`, replace the
+database password, and set its ownership and permissions:
+
+    sudo chown root:tryton /etc/trytond/trytond.env
+    sudo chmod 0640 /etc/trytond/trytond.env
+
+Install the service template as `/etc/systemd/system/trytond.service`. Review
+the paths in the unit first; its virtual-environment path assumes the server
+was installed in `/opt/alif-retail/venv`.
+
+    sudo systemctl daemon-reload
+    sudo systemctl enable --now trytond.service
+    sudo systemctl status trytond.service
+
+Logs are written to journald:
+
+    sudo journalctl -u trytond.service -f
+
+Do not expose PostgreSQL port 5432 to cashier workstations or the public
+internet. Only the Tryton application service should connect to PostgreSQL.
+Restrict the Tryton application port to the shop LAN and approved integration
+hosts with the host firewall.
+
+## Automated encrypted backups
+
+The supplied backup template uses PostgreSQL's custom dump format and copies
+the matching Tryton filestore while the Tryton service is stopped. It then
+encrypts the combined archive with `age`. The stop is intentional: it keeps
+database records and uploaded files from changing between the two snapshots.
+
+Install `age` and PostgreSQL client tools on the backup host. Create a
+PostgreSQL password file for the service account, mode 0600, with a line in
+the standard format:
+
+    127.0.0.1:5432:*:tryton:REPLACE_WITH_DATABASE_PASSWORD
+
+Copy `backup.env.example` to `/etc/trytond/backup.env`; set the actual
+database, filestore path, backup directory and an `age` public recipient.
+Keep the matching private age identity off the showroom server, preferably
+on a separate recovery device. Protect the configuration:
+
+    sudo chown root:root /etc/trytond/backup.env /etc/trytond/pgpass
+    sudo chmod 0600 /etc/trytond/backup.env /etc/trytond/pgpass
+    sudo install -d -o root -g root -m 0700 /var/backups/tryton
+
+Install `backup-showroom.sh` as `/usr/local/sbin/backup-showroom.sh` with
+root ownership and mode 0700. Copy the supplied service and timer templates
+to `/etc/systemd/system/tryton-backup.service` and
+`/etc/systemd/system/tryton-backup.timer`. Review all paths first, then:
+
+    sudo systemctl daemon-reload
+    sudo systemctl enable --now tryton-backup.timer
+    sudo systemctl list-timers tryton-backup.timer
+
+The job stops `trytond.service`, creates the database dump and filestore
+archive, encrypts them, and restarts Tryton. Any separately configured
+Tryton worker, cron process, or external writer must also be stopped or
+quiesced before snapshotting. Check every backup result in the journal:
+
+    sudo journalctl -u tryton-backup.service
+
+The script does not delete old backups. Configure retention on the backup
+storage only after deciding the required recovery-point objective. Copy
+encrypted backups to a second device or off-site store. A successful backup
+command is not proof of recoverability: rehearse a restore, verify the
+checksum, decrypt with the separately held identity, restore PostgreSQL and
+the filestore, and verify products, images, users, stock and sales.
+
 ## Backups and recovery
 
 At minimum:
