@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<data>
+    <xpath expr="/form/notebook" position="inside">
+        <page string="Apparel" id="apparel">
+            <label name="brand"/>
+            <field name="brand"/>
+            <label name="collection"/>
+            <field name="collection"/>
+            <label name="gender"/>
+            <field name="gender"/>
+            <label name="garment_type"/>
+            <field name="garment_type"/>
+            <label name="fabric"/>
+            <field name="fabric"/>
+            <label name="season"/>
+            <field name="season"/>
+        </page>
+    </xpath>
+</data>
