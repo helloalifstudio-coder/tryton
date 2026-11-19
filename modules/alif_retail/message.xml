@@ -16,5 +16,11 @@
         <record model="ir.message" id="msg_measurement_customer_mismatch">
             <field name="text">The measurement profile must belong to the selected customer.</field>
         </record>
+        <record model="ir.message" id="msg_alteration_number_unique">
+            <field name="text">The alteration order number must be unique.</field>
+        </record>
+        <record model="ir.message" id="msg_alteration_sale_line_product_mismatch">
+            <field name="text">The linked POS sale line must refer to the same garment.</field>
+        </record>
     </data>
 </tryton>
