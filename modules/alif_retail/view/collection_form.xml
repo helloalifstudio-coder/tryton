@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<form>
+    <label name="name"/>
+    <field name="name"/>
+    <label name="code"/>
+    <field name="code"/>
+    <label name="brand"/>
+    <field name="brand"/>
+    <label name="season"/>
+    <field name="season"/>
+    <label name="active"/>
+    <field name="active"/>
+</form>
