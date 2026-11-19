@@ -121,7 +121,12 @@ class AlifRetailTestCase(ModuleTestCase):
         Sale = pool.get('sale.point.sale')
 
         unit, = Uom.search([], limit=1)
-        template = Template(name="Scanner Test Sherwani", default_uom=unit)
+        template = Template(
+            name="Scanner Test Sherwani",
+            default_uom=unit,
+            salable=True,
+            sale_uom=unit,
+        )
         template.save()
         product = Product(template=template)
         product.identifiers = [Identifier(code="ALIF-SCAN-TEST-001")]
