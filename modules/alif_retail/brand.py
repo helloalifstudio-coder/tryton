@@ -2,8 +2,7 @@
 # Copyright (C) 2026 Alif Growth Media
 # Licensed under the GNU General Public License v3 or later.
 
-from trytond.model import (
-    DeactivableMixin, ModelSQL, ModelView, Unique, fields)
+from trytond.model import DeactivableMixin, ModelSQL, ModelView, Unique, fields
 
 
 class Brand(DeactivableMixin, ModelSQL, ModelView):
