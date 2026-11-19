@@ -12,11 +12,5 @@
         <record model="ir.message" id="msg_collection_dates">
             <field name="text">The collection start date must be on or before its end date.</field>
         </record>
-        <record model="ir.message" id="msg_collection_brand_mismatch">
-            <field name="text">The selected collection does not belong to the selected brand.</field>
-        </record>
-        <record model="ir.message" id="msg_collection_brand_required">
-            <field name="text">Select a brand before assigning a collection to this product.</field>
-        </record>
     </data>
 </tryton>

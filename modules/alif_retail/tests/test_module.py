@@ -4,6 +4,7 @@
 
 import datetime
 
+from trytond.model.modelstorage import DomainValidationError
 from trytond.modules.alif_retail.exceptions import RetailValidationError
 from trytond.pool import Pool
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
@@ -78,7 +79,7 @@ class AlifRetailTestCase(ModuleTestCase):
                     'brand': brand_b.id,
                     }])
 
-        with self.assertRaises(RetailValidationError):
+        with self.assertRaises(DomainValidationError):
             Template.create([{
                     'name': 'A Sherwani from Brand A',
                     'type': 'goods',
