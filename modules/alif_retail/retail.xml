@@ -12,6 +12,19 @@
             <field name="name">Customer Measurements</field>
         </record>
 
+        <record model="ir.sequence.type" id="sequence_type_alteration">
+            <field name="name">Alteration Order</field>
+        </record>
+        <record model="ir.sequence.strict" id="sequence_alteration">
+            <field name="name">Alteration Order</field>
+            <field name="sequence_type" ref="sequence_type_alteration"/>
+            <field name="prefix">ALT/</field>
+            <field name="type">incremental</field>
+            <field name="number_next_internal" eval="1"/>
+            <field name="number_increment" eval="1"/>
+            <field name="padding" eval="6"/>
+        </record>
+
         <record model="ir.ui.view" id="brand_view_form">
             <field name="model">alif.retail.brand</field>
             <field name="type">form</field>
