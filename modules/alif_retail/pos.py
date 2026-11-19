@@ -2,13 +2,33 @@
 # See COPYRIGHT and LICENSE for applicable license terms.
 
 from trytond.exceptions import UserError
+from lxml import etree
+
 from trytond.i18n import gettext
 from trytond.model import fields
 from trytond.pool import Pool, PoolMeta
+from trytond.pyson import Eval, PYSONEncoder
 
 
 class POSSale(metaclass=PoolMeta):
     __name__ = 'sale.point.sale'
+
+
+    @classmethod
+    def fields_view_get(cls, view_id=None, view_type='form', level=None):
+        "Enable repeat barcode scanning on the native GTK POS form."
+        result = super().fields_view_get(
+            view_id=view_id, view_type=view_type, level=level)
+        if view_type == 'form' and result.get('arch'):
+            result = result.copy()
+            root = etree.fromstring(result['arch'])
+            root.set('scan_code', 'loop')
+            root.set('scan_code_depends', 'lines,state')
+            root.set('scan_code_states', PYSONEncoder().encode({
+                'readonly': Eval('state') != 'open',
+            }))
+            result['arch'] = etree.tostring(root, encoding='unicode')
+        return result
 
     @fields.depends('lines', 'state')
     def on_scan_code(self, code):
