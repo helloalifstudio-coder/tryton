@@ -26,10 +26,12 @@ alif.retail.measurement.profile stores customer measurements in centimetres.
 It validates that supplied dimensions are positive and links each profile
 to one customer.
 
-Measurement access is intentionally separate from normal retail user access.
-Only the Customer Measurements and Retail Manager groups receive access
-through the module's model access records. Assign these groups only to
-staff who need the data.
+Only Customer Measurements and Retail Manager roles can open the dedicated
+measurement menu or read/write detailed dimensions and private notes. Retail
+users have read-only access to profile identity so they can link a profile to
+an alteration order, but field-level access rules hide all body measurements
+and notes. This lets a cashier select the correct customer profile without
+gaining access to sensitive measurements.
 
 Alteration workflow
 -------------------
