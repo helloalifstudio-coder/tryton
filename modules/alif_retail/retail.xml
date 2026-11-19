@@ -141,6 +141,32 @@
         <menuitem parent="sale.menu_sale" action="act_alteration"
             sequence="71" id="menu_alteration"/>
 
+        <record model="ir.model.button" id="alteration_confirm_button">
+            <field name="model">alif.retail.alteration</field>
+            <field name="name">confirm</field>
+            <field name="string">Confirm</field>
+        </record>
+        <record model="ir.model.button" id="alteration_start_button">
+            <field name="model">alif.retail.alteration</field>
+            <field name="name">start</field>
+            <field name="string">Start Work</field>
+        </record>
+        <record model="ir.model.button" id="alteration_mark_ready_button">
+            <field name="model">alif.retail.alteration</field>
+            <field name="name">mark_ready</field>
+            <field name="string">Mark Ready</field>
+        </record>
+        <record model="ir.model.button" id="alteration_deliver_button">
+            <field name="model">alif.retail.alteration</field>
+            <field name="name">deliver</field>
+            <field name="string">Deliver</field>
+        </record>
+        <record model="ir.model.button" id="alteration_cancel_button">
+            <field name="model">alif.retail.alteration</field>
+            <field name="name">cancel</field>
+            <field name="string">Cancel</field>
+        </record>
+
         <record model="ir.model.access" id="access_brand_deny">
             <field name="model">alif.retail.brand</field>
             <field name="perm_read" eval="False"/>
