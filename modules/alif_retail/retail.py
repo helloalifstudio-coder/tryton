@@ -90,22 +90,35 @@ class AlterationOrder(Workflow, ModelSQL, ModelView):
     "Garment Alteration / Tailoring Order"
     __name__ = 'alif.retail.alteration'
     _rec_name = 'number'
+    _draft_states = {
+        'readonly': Eval('state') != 'draft',
+    }
 
     number = fields.Char("Order Number", readonly=True, required=True)
     customer = fields.Many2One(
-        'party.party', "Customer", required=True, ondelete='RESTRICT')
+        'party.party', "Customer", required=True, ondelete='RESTRICT',
+        states=_draft_states, depends={'state'})
     product = fields.Many2One(
-        'product.product', "Garment", required=True, ondelete='RESTRICT')
+        'product.product', "Garment", required=True, ondelete='RESTRICT',
+        states=_draft_states, depends={'state'})
     sale_line = fields.Many2One(
         'sale.point.sale.line', "POS Sale Line", ondelete='SET NULL',
-        help="Optional source sale line for traceability.")
+        help="Optional source sale line for traceability.",
+        states=_draft_states, depends={'state'})
     measurement_profile = fields.Many2One(
         'alif.retail.measurement.profile', "Measurement Profile",
         ondelete='RESTRICT',
-        domain=[('customer', '=', Eval('customer', -1))])
-    received_on = fields.Date("Received On", required=True)
-    due_date = fields.Date("Promised Date", required=True)
-    instructions = fields.Text("Alteration Instructions")
+        domain=[('customer', '=', Eval('customer', -1))],
+        states=_draft_states, depends={'state'})
+    received_on = fields.Date(
+        "Received On", required=True,
+        states=_draft_states, depends={'state'})
+    due_date = fields.Date(
+        "Promised Date", required=True,
+        states=_draft_states, depends={'state'})
+    instructions = fields.Text(
+        "Alteration Instructions",
+        states=_draft_states, depends={'state'})
     state = fields.Selection([
         ('draft', "Draft"),
         ('confirmed', "Confirmed"),
