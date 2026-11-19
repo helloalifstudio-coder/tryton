@@ -18,7 +18,6 @@ classifiers = [
     "Environment :: Plugins",
     "Framework :: Tryton",
     "Topic :: Office/Business",
-    "Topic :: Office/Business :: Retail",
     ]
 
 [project.entry-points.'trytond.modules']
