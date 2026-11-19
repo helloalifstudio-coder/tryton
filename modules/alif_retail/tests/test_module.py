@@ -114,6 +114,21 @@ class AlifRetailTestCase(ModuleTestCase):
 
 
     @with_transaction()
+    def test_product_template_form_exposes_apparel_metadata(self):
+        "The native product style form includes the apparel fields."
+        Template = Pool().get('product.template')
+        view = Template.fields_view_get(view_type='form')
+        root = etree.fromstring(view['arch'])
+
+        for field in (
+                'brand', 'collection', 'gender', 'garment_type',
+                'fabric', 'season'):
+            self.assertTrue(
+                root.xpath(f".//field[@name='{field}']"),
+                msg=f"Missing apparel field in GTK product form: {field}")
+        self.assertTrue(root.xpath(".//page[@id='apparel']"))
+
+    @with_transaction()
     def test_pos_form_enables_native_repeat_scanning(self):
         "The POS form advertises scanner support only while a sale is open."
         Sale = Pool().get('sale.point.sale')
@@ -123,6 +138,7 @@ class AlifRetailTestCase(ModuleTestCase):
         self.assertEqual(root.get('scan_code'), 'loop')
         self.assertEqual(root.get('scan_code_depends'), 'lines,state')
         self.assertTrue(root.get('scan_code_states'))
+        self.assertIn('customer', view['fields'])
 
     @with_transaction()
     def test_pos_scanner_adds_and_increments_variant(self):
