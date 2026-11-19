@@ -68,6 +68,9 @@ Operational
 :ref:`Sale Point <index-sale-point>`
    Point of Sales.
 
+:doc:`Alif Retail <alif_retail:index>`
+   Menswear catalogue, measurement profiles and alteration workflows.
+
 :ref:`Sale Rental <index-sale-rental>`
     Rents assets and services.
 
