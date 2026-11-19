@@ -13,6 +13,17 @@ from trytond.pyson import Eval, PYSONEncoder
 class POSSale(metaclass=PoolMeta):
     __name__ = 'sale.point.sale'
 
+    _open_states = {
+        'readonly': Eval('state') != 'open',
+    }
+
+    customer = fields.Many2One(
+        'party.party', "Customer",
+        ondelete='RESTRICT',
+        states=_open_states,
+        depends={'state'},
+        help="Optional customer for CRM, alterations and transaction history.")
+
 
     @classmethod
     def fields_view_get(cls, view_id=None, view_type='form', level=None):
