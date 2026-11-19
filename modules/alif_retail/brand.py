@@ -10,7 +10,7 @@ class Brand(DeactivableMixin, ModelSQL, ModelView):
     __name__ = 'alif.retail.brand'
     _rec_name = 'name'
 
-    code = fields.Char("Code", required=True, strip='both')
+    code = fields.Char("Code", required=True, strip=True)
     name = fields.Char("Name", required=True, translate=True)
 
     @classmethod
@@ -29,7 +29,7 @@ class Collection(DeactivableMixin, ModelSQL, ModelView):
     __name__ = 'alif.retail.collection'
     _rec_name = 'name'
 
-    code = fields.Char("Code", required=True, strip='both')
+    code = fields.Char("Code", required=True, strip=True)
     name = fields.Char("Name", required=True, translate=True)
     brand = fields.Many2One(
         'alif.retail.brand', "Brand", ondelete='RESTRICT')
