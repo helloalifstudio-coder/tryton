@@ -61,9 +61,9 @@ containing the initial Tryton administrator password. Restrict that file to
 the service account (mode 0600). Then activate the required modules and
 their dependencies:
 
-    TRYTOND_CONFIG=/etc/trytond/trytond.conf
-    TRYTOND_DATABASE_URI='postgresql://tryton:CHANGE_ME@127.0.0.1:5432/'
-    TRYTONPASSFILE=/etc/trytond/admin.pass
+    export TRYTOND_CONFIG=/etc/trytond/trytond.conf
+    export TRYTOND_DATABASE_URI='postgresql://tryton:CHANGE_ME@127.0.0.1:5432/'
+    export TRYTONPASSFILE=/etc/trytond/admin.pass
     trytond-admin -d showroom -u ir res company country currency party product product_attribute stock account account_product account_invoice account_invoice_stock account_payment purchase sale sale_point alif_retail --activate-dependencies
 
 Confirm module activation in the administration client. Do not use --all as
