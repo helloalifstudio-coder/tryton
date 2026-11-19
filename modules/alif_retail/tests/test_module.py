@@ -4,6 +4,7 @@
 from datetime import date
 from decimal import Decimal
 
+from trytond.exceptions import UserError
 from trytond.model.exceptions import AccessError, ValidationError
 from trytond.pool import Pool
 from trytond.tests.test_tryton import ModuleTestCase, with_transaction
@@ -108,6 +109,51 @@ class AlifRetailTestCase(ModuleTestCase):
         with Transaction().set_user(measurement_user.id):
             record, = Profile.read([profile.id], ['chest_cm'])
             self.assertEqual(record['chest_cm'], Decimal('100.0'))
+
+    @with_transaction()
+    def test_pos_scanner_adds_and_increments_variant(self):
+        "A barcode adds one variant line and repeat scans increment quantity."
+        pool = Pool()
+        Uom = pool.get('product.uom')
+        Template = pool.get('product.template')
+        Product = pool.get('product.product')
+        Identifier = pool.get('product.identifier')
+        Sale = pool.get('sale.point.sale')
+
+        unit, = Uom.search([], limit=1)
+        template = Template(name="Scanner Test Sherwani", default_uom=unit)
+        template.save()
+        product = Product(template=template)
+        product.identifiers = [Identifier(code="ALIF-SCAN-TEST-001")]
+        product.save()
+
+        sale = Sale(state='open', lines=[])
+        sale.on_scan_code("ALIF-SCAN-TEST-001")
+        self.assertEqual(len(sale.lines), 1)
+        self.assertEqual(sale.lines[0].product, product)
+        self.assertEqual(sale.lines[0].quantity, 1)
+
+        sale.on_scan_code("ALIF-SCAN-TEST-001")
+        self.assertEqual(len(sale.lines), 1)
+        self.assertEqual(sale.lines[0].quantity, 2)
+
+    @with_transaction()
+    def test_pos_scanner_rejects_unknown_barcode(self):
+        "An unknown barcode must never silently create a sale line."
+        Sale = Pool().get('sale.point.sale')
+        sale = Sale(state='open', lines=[])
+
+        with self.assertRaises(UserError):
+            sale.on_scan_code("UNKNOWN-ALIF-BARCODE")
+
+    @with_transaction()
+    def test_pos_scanner_requires_open_sale(self):
+        "A posted or completed sale must not be changed by scanning."
+        Sale = Pool().get('sale.point.sale')
+        sale = Sale(state='posted', lines=[])
+
+        with self.assertRaises(UserError):
+            sale.on_scan_code("ALIF-SCAN-TEST-001")
 
 
 del ModuleTestCase, with_transaction
