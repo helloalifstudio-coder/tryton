@@ -78,7 +78,9 @@ class POSSale(metaclass=PoolMeta):
             line.sale = self
             line.product = product
             line.quantity = 1
-            self.lines.append(line)
+            lines = list(self.lines)
+            lines.append(line)
+            self.lines = lines
         else:
             line.quantity += 1
 
