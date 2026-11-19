@@ -188,6 +188,14 @@
             <field name="perm_create" eval="False"/>
             <field name="perm_delete" eval="False"/>
         </record>
+        <record model="ir.model.access" id="access_measurement_user">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="group" ref="group_retail_user"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
         <record model="ir.model.access" id="access_measurement_group">
             <field name="model">alif.retail.measurement.profile</field>
             <field name="group" ref="group_retail_measurements"/>
@@ -227,6 +235,186 @@
             <field name="perm_write" eval="True"/>
             <field name="perm_create" eval="True"/>
             <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_notes_deny">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">notes</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_notes_retail_measurements">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">notes</field>
+            <field name="group" ref="group_retail_measurements"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_notes_retail_manager">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">notes</field>
+            <field name="group" ref="group_retail_manager"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_chestcm_deny">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">chest_cm</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_chestcm_retail_measurements">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">chest_cm</field>
+            <field name="group" ref="group_retail_measurements"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_chestcm_retail_manager">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">chest_cm</field>
+            <field name="group" ref="group_retail_manager"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_shouldercm_deny">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">shoulder_cm</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_shouldercm_retail_measurements">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">shoulder_cm</field>
+            <field name="group" ref="group_retail_measurements"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_shouldercm_retail_manager">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">shoulder_cm</field>
+            <field name="group" ref="group_retail_manager"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_sleevecm_deny">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">sleeve_cm</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_sleevecm_retail_measurements">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">sleeve_cm</field>
+            <field name="group" ref="group_retail_measurements"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_sleevecm_retail_manager">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">sleeve_cm</field>
+            <field name="group" ref="group_retail_manager"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_neckcm_deny">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">neck_cm</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_neckcm_retail_measurements">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">neck_cm</field>
+            <field name="group" ref="group_retail_measurements"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_neckcm_retail_manager">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">neck_cm</field>
+            <field name="group" ref="group_retail_manager"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_waistcm_deny">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">waist_cm</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_waistcm_retail_measurements">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">waist_cm</field>
+            <field name="group" ref="group_retail_measurements"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_waistcm_retail_manager">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">waist_cm</field>
+            <field name="group" ref="group_retail_manager"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_hipcm_deny">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">hip_cm</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_hipcm_retail_measurements">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">hip_cm</field>
+            <field name="group" ref="group_retail_measurements"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_hipcm_retail_manager">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">hip_cm</field>
+            <field name="group" ref="group_retail_manager"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_inseamcm_deny">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">inseam_cm</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_inseamcm_retail_measurements">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">inseam_cm</field>
+            <field name="group" ref="group_retail_measurements"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_inseamcm_retail_manager">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">inseam_cm</field>
+            <field name="group" ref="group_retail_manager"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_kurtalengthcm_deny">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">kurta_length_cm</field>
+            <field name="perm_read" eval="False"/>
+            <field name="perm_write" eval="False"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_kurtalengthcm_retail_measurements">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">kurta_length_cm</field>
+            <field name="group" ref="group_retail_measurements"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+        </record>
+        <record model="ir.model.field.access" id="access_measurement_kurtalengthcm_retail_manager">
+            <field name="model">alif.retail.measurement.profile</field>
+            <field name="field">kurta_length_cm</field>
+            <field name="group" ref="group_retail_manager"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
         </record>
     </data>
 </tryton>
