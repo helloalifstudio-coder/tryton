@@ -8,7 +8,6 @@
     <field name="measured_on"/>
     <label name="active"/>
     <field name="active"/>
-    <separator string="Measurements (centimetres)" colspan="4"/>
     <label name="chest_cm"/>
     <field name="chest_cm"/>
     <label name="shoulder_cm"/>
