@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!-- This file is part of Alif Retail for Tryton. GPL-3.0-or-later. -->
+<data>
+    <xpath expr="/form/notebook" position="inside">
+        <page string="Retail" id="alif_retail">
+            <label name="brand"/>
+            <field name="brand"/>
+            <label name="collection"/>
+            <field name="collection"/>
+            <label name="retail_department"/>
+            <field name="retail_department"/>
+            <label name="garment_type"/>
+            <field name="garment_type"/>
+            <label name="fabric_composition"/>
+            <field name="fabric_composition"/>
+            <label name="fit"/>
+            <field name="fit"/>
+            <label name="care_instructions" yalign="0"/>
+            <field name="care_instructions" colspan="3" yexpand="0" height="70"/>
+        </page>
+    </xpath>
+</data>

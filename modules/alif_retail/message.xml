@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- This file is part of Alif Retail for Tryton.
+     Copyright (C) 2026 Alif Growth Media. GPL-3.0-or-later. -->
+<tryton>
+    <data grouped="1">
+        <record model="ir.message" id="msg_brand_code_unique">
+            <field name="text">The brand code must be unique.</field>
+        </record>
+        <record model="ir.message" id="msg_collection_code_unique">
+            <field name="text">The collection code must be unique.</field>
+        </record>
+    </data>
+</tryton>

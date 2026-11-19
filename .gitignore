@@ -1,0 +1,31 @@
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+deploy/docker/.env
+**/secrets/
+*.pem
+*.key
+
+# Local retail data and backups
+/backups/
+*.dump
+*.sql
+*.tar.gz
+*.backup
+
+# Python/build/test artefacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.build/
+dist/
+build/
+.coverage
+.pytest_cache/
+.tox/
+.venv/
+venv/
+
+# Local logs
+*.log

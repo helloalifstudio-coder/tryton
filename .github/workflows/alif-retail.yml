@@ -1,0 +1,56 @@
+name: Alif Retail module quality
+
+on:
+  push:
+    branches:
+      - "alif/**"
+      - "release/8.0-lts"
+    paths:
+      - "modules/alif_retail/**"
+      - ".github/workflows/alif-retail.yml"
+  pull_request:
+    paths:
+      - "modules/alif_retail/**"
+      - ".github/workflows/alif-retail.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  module:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install module and quality tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install flake8 isort build
+          python -m pip install ./modules/alif_retail
+
+      - name: Lint
+        run: |
+          flake8 modules/alif_retail
+          isort --check --diff modules/alif_retail
+
+      - name: Compile
+        run: python -m compileall -q modules/alif_retail
+
+      - name: Module tests
+        env:
+          TRYTOND_DATABASE__URI: sqlite://
+        run: python -m unittest discover -s modules/alif_retail/tests -p "test*.py"
+
+      - name: Build wheel
+        run: python -m build --wheel modules/alif_retail
