@@ -51,6 +51,8 @@ class POSSale(metaclass=PoolMeta):
         else:
             line.quantity += 1
 
-        # POS line pricing/taxes are calculated by the upstream sale_point
-        # model. Never copy a price from the scanner or from the client.
+        # Resolve the sale unit before applying the upstream POS pricing/tax
+        # calculation. Stock moves require this unit when the sale is posted.
+        line.unit = line.on_change_with_unit()
+        # Never copy a price from the scanner or from the client.
         line.on_change_product()
