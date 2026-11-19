@@ -1,0 +1,20 @@
+[web]
+listen = 0.0.0.0:8000
+root_path = /
+num_proxies = 0
+
+[database]
+# Prefer TRYTOND_DATABASE_URI in the service environment so credentials are
+# not committed to the repository or stored in this file.
+list = False
+path = /var/lib/trytond
+retry = 5
+language = en
+timeout = 1800
+
+[request]
+timeout = 60
+
+[session]
+# Tune session lifetime to the shop's security policy.
+timeout = 3600
