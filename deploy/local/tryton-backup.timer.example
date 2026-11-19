@@ -1,0 +1,11 @@
+[Unit]
+Description=Nightly encrypted Tryton showroom backup
+
+[Timer]
+OnCalendar=*-*-* 02:30:00
+RandomizedDelaySec=10m
+Persistent=true
+Unit=tryton-backup.service
+
+[Install]
+WantedBy=timers.target
