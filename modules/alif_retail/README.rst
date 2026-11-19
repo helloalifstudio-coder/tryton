@@ -33,9 +33,11 @@ identifier. Do not use one barcode for all sizes or colours of a design.
 The product template is the style; its product variants are the stockable
 units.
 
-The measurements model contains personal customer information. Grant the
-'Customer Measurements' group only to staff who need that information.
-Do not expose measurement models through public or anonymous integrations.
+Customer measurements are protected at both menu and field level. Ordinary
+retail users can select a saved profile for an alteration but cannot read the
+body dimensions or private notes. Only the Customer Measurements and Retail
+Manager groups can open the measurements screen and read/write those fields.
+Assign these groups only to staff who need that data.
 
 Not yet implemented
 -------------------
