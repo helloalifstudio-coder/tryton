@@ -18,7 +18,7 @@
     <field name="due_date"/>
     <label name="instructions"/>
     <field name="instructions" colspan="3"/>
-    <group col="-1" colspan="4">
+    <group col="-1" colspan="4" id="workflow_buttons">
         <button name="confirm"/>
         <button name="start"/>
         <button name="mark_ready"/>
