@@ -48,14 +48,26 @@ The installer:
 - Creates deploy/docker/.env only if it does not already exist.
 - Generates separate high-entropy database and Tryton administrator
   passwords; it never writes credentials into Git.
+- Restricts the .env file to the current Windows account.
 - Builds the server image containing alif_retail.
 - Starts PostgreSQL and waits for its health check.
 - Runs the one-time Tryton database/module initialization.
-- Starts the Tryton server and cron services.
+- Starts Tryton and waits for its health check.
 
 **Save the initial administrator password shown at the end of installation.**
 Sign in using the native desktop client at 127.0.0.1:8000, select the database
 named in deploy/docker/.env, and change the password immediately.
+
+The installer refuses to overwrite an existing .env. If the first-time
+installation fails after the .env was created, inspect the logs and resume only
+that incomplete first installation with:
+
+    .\deploy\windows\Install-AlifRetail.ps1 -Resume
+
+The resume mode preserves the existing database and administrator secrets;
+it does not print or rotate them. Do not use -Resume as a routine upgrade
+command or against a live system with business data. For ordinary daily use,
+run Run-ALIF-Retail.cmd.
 
 ## Daily use
 
