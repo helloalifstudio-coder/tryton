@@ -33,8 +33,12 @@ try {
     $DockerOs = $null
 }
 if ($LASTEXITCODE -ne 0 -or -not $DockerOs) {
-    $DockerDesktop = Join-Path $env:ProgramFiles "Docker/Docker/Docker Desktop.exe"
-    if (-not (Test-Path $DockerDesktop)) {
+    $DockerCandidates = @(
+        (Join-Path $env:ProgramFiles "Docker/Docker/Docker Desktop.exe"),
+        (Join-Path $env:LOCALAPPDATA "Programs/DockerDesktop/Docker Desktop.exe")
+    )
+    $DockerDesktop = $DockerCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+    if (-not $DockerDesktop) {
         throw "Docker Desktop is not running and its executable was not found."
     }
     Start-Process -FilePath $DockerDesktop
@@ -73,6 +77,23 @@ if (-not $Healthy) {
 }
 
 Invoke-Compose @("up", "-d", "server", "cron")
+$Deadline = (Get-Date).AddMinutes(3)
+$ServerHealthy = $false
+do {
+    $ServerId = (& docker compose --env-file $EnvFile -f $ComposeFile ps -q server 2>$null).Trim()
+    if ($LASTEXITCODE -eq 0 -and $ServerId) {
+        $ServerHealth = (& docker inspect --format "{{.State.Health.Status}}" $ServerId 2>$null).Trim()
+        if ($ServerHealth -eq "healthy") {
+            $ServerHealthy = $true
+            break
+        }
+    }
+    Start-Sleep -Seconds 3
+} while ((Get-Date) -lt $Deadline)
+if (-not $ServerHealthy) {
+    Invoke-Compose @("logs", "--tail=100", "server")
+    throw "Tryton server did not become healthy. The desktop client was not opened."
+}
 Invoke-Compose @("ps")
 
 if ($LaunchClient) {
