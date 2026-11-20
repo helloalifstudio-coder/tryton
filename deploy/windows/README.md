@@ -94,6 +94,17 @@ operation and validate login, attachments, stock balances and a test invoice
 before trading again. A successful backup is not proof of a successful
 restore; record a clean restore drill before production use.
 
+Register a daily backup task after choosing a time outside trading hours:
+
+    .\deploy\windows\Register-BackupTask.ps1 -Time "22:30"
+
+The task runs under the current Windows account and only while that user is
+signed in. If the PC is off or the user is signed out at the scheduled time,
+Windows runs a missed task at the next eligible sign-in. Verify the task's
+Last Run Result in Task Scheduler and check each backup-manifest.json and
+backup.log. Keep at least one recent backup on encrypted storage separate
+from the PC.
+
 ## Offline behaviour
 
 After the first successful installation, normal inventory, customer, billing,
