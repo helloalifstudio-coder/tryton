@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
-    [string]$OwnerEmail
+    [string]$OwnerEmail,
+    [switch]$Resume
 )
 
 Set-StrictMode -Version Latest
@@ -73,15 +74,443 @@ if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
 if (-not (Test-Path $EnvExample)) {
     throw "Missing deployment template: $EnvExample"
 }
-if (Test-Path $EnvFile) {
-    throw "A deploy/docker/.env already exists. Refusing to overwrite credentials or an existing installation. Use Start-AlifRetail.ps1 instead."
+$IsNewEnvironment = -not (Test-Path $EnvFile)
+if (-not $IsNewEnvironment -and -not $Resume) {
+    throw "A deploy/docker/.env already exists. Refusing to overwrite credentials or an existing installation. Use Start-AlifRetail.ps1 for normal use, or -Resume only to continue a failed first-time installation."
+}
+if ($Resume -and $IsNewEnvironment) {
+    throw "-Resume requires an existing deploy/docker/.env file."
 }
 
-if (-not $OwnerEmail) {
-    $OwnerEmail = Read-Host "Owner email for the initial Tryton administrator"
+if ($IsNewEnvironment) {
+    if (-not $OwnerEmail) {
+        $OwnerEmail = Read-Host "Owner email for the initial Tryton administrator"
+    }
+    if ($OwnerEmail -notmatch '^[^@\s]+@[^@\s]+\.[^@\s]+
+
+# Start Docker Desktop when installed but not already running.
+$DockerOs = $null
+try {
+    $DockerOs = (& docker info --format "{{.OSType}}" 2>$null).Trim()
+} catch {
+    $DockerOs = $null
 }
-if ($OwnerEmail -notmatch '^[^@\s]+@[^@\s]+\.[^@\s]+$') {
-    throw "Enter a valid owner email address."
+if ($LASTEXITCODE -ne 0 -or -not $DockerOs) {
+    $DockerCandidates = @(
+        (Join-Path $env:ProgramFiles "Docker/Docker/Docker Desktop.exe"),
+        (Join-Path $env:LOCALAPPDATA "Programs/DockerDesktop/Docker Desktop.exe")
+    )
+    $DockerDesktop = $DockerCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+    if (-not $DockerDesktop) {
+        throw "Docker Desktop is not installed or the engine is unavailable. Install/start Docker Desktop and enable its WSL 2 Linux engine."
+    }
+    Start-Process -FilePath $DockerDesktop
+    $Deadline = (Get-Date).AddMinutes(3)
+    do {
+        Start-Sleep -Seconds 3
+        try {
+            $DockerOs = (& docker info --format "{{.OSType}}" 2>$null).Trim()
+        } catch {
+            $DockerOs = $null
+        }
+    } while ((-not $DockerOs -or $LASTEXITCODE -ne 0) -and (Get-Date) -lt $Deadline)
+}
+if (-not $DockerOs -or $DockerOs -ne "linux") {
+    throw "Docker Desktop must be using Linux containers with the WSL 2 backend."
+}
+
+$AdminPassword = $null
+if ($IsNewEnvironment) {
+    $DbPassword = New-UrlSafeSecret
+    $AdminPassword = New-UrlSafeSecret
+    $EnvContent = Get-Content -LiteralPath $EnvExample -Raw
+    $EnvContent = $EnvContent.Replace(
+        "DB_PASSWORD=REPLACE_WITH_A_LONG_RANDOM_DATABASE_PASSWORD",
+        "DB_PASSWORD=$DbPassword")
+    $EnvContent = $EnvContent.Replace(
+        "TRYTON_ADMIN_EMAIL=owner@example.invalid",
+        "TRYTON_ADMIN_EMAIL=$OwnerEmail")
+    $EnvContent = $EnvContent.Replace(
+        "TRYTON_ADMIN_PASSWORD=REPLACE_WITH_A_DIFFERENT_LONG_RANDOM_ADMIN_PASSWORD",
+        "TRYTON_ADMIN_PASSWORD=$AdminPassword")
+
+    # Write UTF-8 without BOM; Docker Compose dotenv parsing expects a clean first key.
+    [System.IO.File]::WriteAllText(
+        $EnvFile,
+        $EnvContent,
+        (New-Object System.Text.UTF8Encoding($false)))
+}
+else {
+    $ExistingEnv = Get-Content -LiteralPath $EnvFile -Raw
+    foreach ($Placeholder in @(
+        "REPLACE_WITH_A_LONG_RANDOM_DATABASE_PASSWORD",
+        "REPLACE_WITH_A_DIFFERENT_LONG_RANDOM_ADMIN_PASSWORD"
+    )) {
+        if ($ExistingEnv.Contains($Placeholder)) {
+            throw "The existing .env still contains a placeholder secret. Replace it securely before using -Resume."
+        }
+    }
+    if ($ExistingEnv -notmatch '(?m)^DB_PASSWORD=.+
+
+try {
+    Invoke-Compose @("build", "server")
+    Invoke-Compose @("up", "-d", "postgres")
+    Wait-ForPostgres
+    Invoke-Compose @("--profile", "setup", "run", "--rm", "init")
+    Invoke-Compose @("up", "-d", "server", "cron")
+    Wait-ForServer
+}
+catch {
+    Write-Error "Installation stopped. Existing Docker volumes have not been deleted. Review the Compose logs before retrying."
+    throw
+}
+
+Write-Host ""
+Write-Host "ALIF Retail local services were initialized." -ForegroundColor Green
+Write-Host "Server address: 127.0.0.1:8000"
+if ($IsNewEnvironment) {
+    Write-Host "Initial administrator email: $OwnerEmail"
+    Write-Host "Initial administrator password (shown once): $AdminPassword" -ForegroundColor Yellow
+    Write-Host "Store this password securely, sign in with the official Tryton 8.0 desktop client, then change it."
+}
+else {
+    Write-Host "Existing deployment credentials were preserved. The administrator password was not displayed."
+}
+Write-Host "The secret file is: $EnvFile"
+Write-Host "Use Start-AlifRetail.ps1 or Run-ALIF-Retail.cmd for normal use. Neither script deletes the data volumes."
+) {
+        throw "Enter a valid owner email address."
+    }
+}
+
+# Start Docker Desktop when installed but not already running.
+$DockerOs = $null
+try {
+    $DockerOs = (& docker info --format "{{.OSType}}" 2>$null).Trim()
+} catch {
+    $DockerOs = $null
+}
+if ($LASTEXITCODE -ne 0 -or -not $DockerOs) {
+    $DockerCandidates = @(
+        (Join-Path $env:ProgramFiles "Docker/Docker/Docker Desktop.exe"),
+        (Join-Path $env:LOCALAPPDATA "Programs/DockerDesktop/Docker Desktop.exe")
+    )
+    $DockerDesktop = $DockerCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+    if (-not $DockerDesktop) {
+        throw "Docker Desktop is not installed or the engine is unavailable. Install/start Docker Desktop and enable its WSL 2 Linux engine."
+    }
+    Start-Process -FilePath $DockerDesktop
+    $Deadline = (Get-Date).AddMinutes(3)
+    do {
+        Start-Sleep -Seconds 3
+        try {
+            $DockerOs = (& docker info --format "{{.OSType}}" 2>$null).Trim()
+        } catch {
+            $DockerOs = $null
+        }
+    } while ((-not $DockerOs -or $LASTEXITCODE -ne 0) -and (Get-Date) -lt $Deadline)
+}
+if (-not $DockerOs -or $DockerOs -ne "linux") {
+    throw "Docker Desktop must be using Linux containers with the WSL 2 backend."
+}
+
+$DbPassword = New-UrlSafeSecret
+$AdminPassword = New-UrlSafeSecret
+$EnvContent = Get-Content -LiteralPath $EnvExample -Raw
+$EnvContent = $EnvContent.Replace(
+    "DB_PASSWORD=REPLACE_WITH_A_LONG_RANDOM_DATABASE_PASSWORD",
+    "DB_PASSWORD=$DbPassword")
+$EnvContent = $EnvContent.Replace(
+    "TRYTON_ADMIN_EMAIL=owner@example.invalid",
+    "TRYTON_ADMIN_EMAIL=$OwnerEmail")
+$EnvContent = $EnvContent.Replace(
+    "TRYTON_ADMIN_PASSWORD=REPLACE_WITH_A_DIFFERENT_LONG_RANDOM_ADMIN_PASSWORD",
+    "TRYTON_ADMIN_PASSWORD=$AdminPassword")
+
+# Write UTF-8 without BOM; Docker Compose dotenv parsing expects a clean first key.
+[System.IO.File]::WriteAllText(
+    $EnvFile,
+    $EnvContent,
+    (New-Object System.Text.UTF8Encoding($false)))
+
+# Restrict the credential file to the current Windows user.
+$CurrentIdentity = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+& icacls.exe $EnvFile /inheritance:r /grant:r ($CurrentIdentity + ":(R,W)") | Out-Null
+if ($LASTEXITCODE -ne 0) {
+    throw "Could not restrict permissions on deploy/docker/.env."
+}
+
+try {
+    Invoke-Compose @("build", "server")
+    Invoke-Compose @("up", "-d", "postgres")
+    Wait-ForPostgres
+    Invoke-Compose @("--profile", "setup", "run", "--rm", "init")
+    Invoke-Compose @("up", "-d", "server", "cron")
+    Wait-ForServer
+}
+catch {
+    Write-Error "Installation stopped. Existing Docker volumes have not been deleted. Review the Compose logs before retrying."
+    throw
+}
+
+Write-Host ""
+Write-Host "ALIF Retail local services were initialized." -ForegroundColor Green
+Write-Host "Server address: 127.0.0.1:8000"
+Write-Host "Initial administrator: $OwnerEmail"
+Write-Host "Initial administrator password (shown once): $AdminPassword" -ForegroundColor Yellow
+Write-Host "Store this password securely, sign in with the official Tryton 8.0 desktop client, then change it."
+Write-Host "The secret file is: $EnvFile"
+Write-Host "Use Start-AlifRetail.ps1 to start later and Stop-AlifRetail.ps1 to stop. Neither script deletes the data volumes."
+ -or
+        $ExistingEnv -notmatch '(?m)^TRYTON_ADMIN_PASSWORD=.+
+
+try {
+    Invoke-Compose @("build", "server")
+    Invoke-Compose @("up", "-d", "postgres")
+    Wait-ForPostgres
+    Invoke-Compose @("--profile", "setup", "run", "--rm", "init")
+    Invoke-Compose @("up", "-d", "server", "cron")
+    Wait-ForServer
+}
+catch {
+    Write-Error "Installation stopped. Existing Docker volumes have not been deleted. Review the Compose logs before retrying."
+    throw
+}
+
+Write-Host ""
+Write-Host "ALIF Retail local services were initialized." -ForegroundColor Green
+Write-Host "Server address: 127.0.0.1:8000"
+Write-Host "Initial administrator: $OwnerEmail"
+Write-Host "Initial administrator password (shown once): $AdminPassword" -ForegroundColor Yellow
+Write-Host "Store this password securely, sign in with the official Tryton 8.0 desktop client, then change it."
+Write-Host "The secret file is: $EnvFile"
+Write-Host "Use Start-AlifRetail.ps1 to start later and Stop-AlifRetail.ps1 to stop. Neither script deletes the data volumes."
+) {
+        throw "Enter a valid owner email address."
+    }
+}
+
+# Start Docker Desktop when installed but not already running.
+$DockerOs = $null
+try {
+    $DockerOs = (& docker info --format "{{.OSType}}" 2>$null).Trim()
+} catch {
+    $DockerOs = $null
+}
+if ($LASTEXITCODE -ne 0 -or -not $DockerOs) {
+    $DockerCandidates = @(
+        (Join-Path $env:ProgramFiles "Docker/Docker/Docker Desktop.exe"),
+        (Join-Path $env:LOCALAPPDATA "Programs/DockerDesktop/Docker Desktop.exe")
+    )
+    $DockerDesktop = $DockerCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+    if (-not $DockerDesktop) {
+        throw "Docker Desktop is not installed or the engine is unavailable. Install/start Docker Desktop and enable its WSL 2 Linux engine."
+    }
+    Start-Process -FilePath $DockerDesktop
+    $Deadline = (Get-Date).AddMinutes(3)
+    do {
+        Start-Sleep -Seconds 3
+        try {
+            $DockerOs = (& docker info --format "{{.OSType}}" 2>$null).Trim()
+        } catch {
+            $DockerOs = $null
+        }
+    } while ((-not $DockerOs -or $LASTEXITCODE -ne 0) -and (Get-Date) -lt $Deadline)
+}
+if (-not $DockerOs -or $DockerOs -ne "linux") {
+    throw "Docker Desktop must be using Linux containers with the WSL 2 backend."
+}
+
+$DbPassword = New-UrlSafeSecret
+$AdminPassword = New-UrlSafeSecret
+$EnvContent = Get-Content -LiteralPath $EnvExample -Raw
+$EnvContent = $EnvContent.Replace(
+    "DB_PASSWORD=REPLACE_WITH_A_LONG_RANDOM_DATABASE_PASSWORD",
+    "DB_PASSWORD=$DbPassword")
+$EnvContent = $EnvContent.Replace(
+    "TRYTON_ADMIN_EMAIL=owner@example.invalid",
+    "TRYTON_ADMIN_EMAIL=$OwnerEmail")
+$EnvContent = $EnvContent.Replace(
+    "TRYTON_ADMIN_PASSWORD=REPLACE_WITH_A_DIFFERENT_LONG_RANDOM_ADMIN_PASSWORD",
+    "TRYTON_ADMIN_PASSWORD=$AdminPassword")
+
+# Write UTF-8 without BOM; Docker Compose dotenv parsing expects a clean first key.
+[System.IO.File]::WriteAllText(
+    $EnvFile,
+    $EnvContent,
+    (New-Object System.Text.UTF8Encoding($false)))
+
+# Restrict the credential file to the current Windows user.
+$CurrentIdentity = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+& icacls.exe $EnvFile /inheritance:r /grant:r ($CurrentIdentity + ":(R,W)") | Out-Null
+if ($LASTEXITCODE -ne 0) {
+    throw "Could not restrict permissions on deploy/docker/.env."
+}
+
+try {
+    Invoke-Compose @("build", "server")
+    Invoke-Compose @("up", "-d", "postgres")
+    Wait-ForPostgres
+    Invoke-Compose @("--profile", "setup", "run", "--rm", "init")
+    Invoke-Compose @("up", "-d", "server", "cron")
+    Wait-ForServer
+}
+catch {
+    Write-Error "Installation stopped. Existing Docker volumes have not been deleted. Review the Compose logs before retrying."
+    throw
+}
+
+Write-Host ""
+Write-Host "ALIF Retail local services were initialized." -ForegroundColor Green
+Write-Host "Server address: 127.0.0.1:8000"
+Write-Host "Initial administrator: $OwnerEmail"
+Write-Host "Initial administrator password (shown once): $AdminPassword" -ForegroundColor Yellow
+Write-Host "Store this password securely, sign in with the official Tryton 8.0 desktop client, then change it."
+Write-Host "The secret file is: $EnvFile"
+Write-Host "Use Start-AlifRetail.ps1 to start later and Stop-AlifRetail.ps1 to stop. Neither script deletes the data volumes."
+ -or
+        $ExistingEnv -notmatch '(?m)^TRYTON_ADMIN_EMAIL=[^@\s]+@[^@\s]+\.[^@\s]+
+
+try {
+    Invoke-Compose @("build", "server")
+    Invoke-Compose @("up", "-d", "postgres")
+    Wait-ForPostgres
+    Invoke-Compose @("--profile", "setup", "run", "--rm", "init")
+    Invoke-Compose @("up", "-d", "server", "cron")
+    Wait-ForServer
+}
+catch {
+    Write-Error "Installation stopped. Existing Docker volumes have not been deleted. Review the Compose logs before retrying."
+    throw
+}
+
+Write-Host ""
+Write-Host "ALIF Retail local services were initialized." -ForegroundColor Green
+Write-Host "Server address: 127.0.0.1:8000"
+Write-Host "Initial administrator: $OwnerEmail"
+Write-Host "Initial administrator password (shown once): $AdminPassword" -ForegroundColor Yellow
+Write-Host "Store this password securely, sign in with the official Tryton 8.0 desktop client, then change it."
+Write-Host "The secret file is: $EnvFile"
+Write-Host "Use Start-AlifRetail.ps1 to start later and Stop-AlifRetail.ps1 to stop. Neither script deletes the data volumes."
+) {
+        throw "Enter a valid owner email address."
+    }
+}
+
+# Start Docker Desktop when installed but not already running.
+$DockerOs = $null
+try {
+    $DockerOs = (& docker info --format "{{.OSType}}" 2>$null).Trim()
+} catch {
+    $DockerOs = $null
+}
+if ($LASTEXITCODE -ne 0 -or -not $DockerOs) {
+    $DockerCandidates = @(
+        (Join-Path $env:ProgramFiles "Docker/Docker/Docker Desktop.exe"),
+        (Join-Path $env:LOCALAPPDATA "Programs/DockerDesktop/Docker Desktop.exe")
+    )
+    $DockerDesktop = $DockerCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+    if (-not $DockerDesktop) {
+        throw "Docker Desktop is not installed or the engine is unavailable. Install/start Docker Desktop and enable its WSL 2 Linux engine."
+    }
+    Start-Process -FilePath $DockerDesktop
+    $Deadline = (Get-Date).AddMinutes(3)
+    do {
+        Start-Sleep -Seconds 3
+        try {
+            $DockerOs = (& docker info --format "{{.OSType}}" 2>$null).Trim()
+        } catch {
+            $DockerOs = $null
+        }
+    } while ((-not $DockerOs -or $LASTEXITCODE -ne 0) -and (Get-Date) -lt $Deadline)
+}
+if (-not $DockerOs -or $DockerOs -ne "linux") {
+    throw "Docker Desktop must be using Linux containers with the WSL 2 backend."
+}
+
+$DbPassword = New-UrlSafeSecret
+$AdminPassword = New-UrlSafeSecret
+$EnvContent = Get-Content -LiteralPath $EnvExample -Raw
+$EnvContent = $EnvContent.Replace(
+    "DB_PASSWORD=REPLACE_WITH_A_LONG_RANDOM_DATABASE_PASSWORD",
+    "DB_PASSWORD=$DbPassword")
+$EnvContent = $EnvContent.Replace(
+    "TRYTON_ADMIN_EMAIL=owner@example.invalid",
+    "TRYTON_ADMIN_EMAIL=$OwnerEmail")
+$EnvContent = $EnvContent.Replace(
+    "TRYTON_ADMIN_PASSWORD=REPLACE_WITH_A_DIFFERENT_LONG_RANDOM_ADMIN_PASSWORD",
+    "TRYTON_ADMIN_PASSWORD=$AdminPassword")
+
+# Write UTF-8 without BOM; Docker Compose dotenv parsing expects a clean first key.
+[System.IO.File]::WriteAllText(
+    $EnvFile,
+    $EnvContent,
+    (New-Object System.Text.UTF8Encoding($false)))
+
+# Restrict the credential file to the current Windows user.
+$CurrentIdentity = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+& icacls.exe $EnvFile /inheritance:r /grant:r ($CurrentIdentity + ":(R,W)") | Out-Null
+if ($LASTEXITCODE -ne 0) {
+    throw "Could not restrict permissions on deploy/docker/.env."
+}
+
+try {
+    Invoke-Compose @("build", "server")
+    Invoke-Compose @("up", "-d", "postgres")
+    Wait-ForPostgres
+    Invoke-Compose @("--profile", "setup", "run", "--rm", "init")
+    Invoke-Compose @("up", "-d", "server", "cron")
+    Wait-ForServer
+}
+catch {
+    Write-Error "Installation stopped. Existing Docker volumes have not been deleted. Review the Compose logs before retrying."
+    throw
+}
+
+Write-Host ""
+Write-Host "ALIF Retail local services were initialized." -ForegroundColor Green
+Write-Host "Server address: 127.0.0.1:8000"
+Write-Host "Initial administrator: $OwnerEmail"
+Write-Host "Initial administrator password (shown once): $AdminPassword" -ForegroundColor Yellow
+Write-Host "Store this password securely, sign in with the official Tryton 8.0 desktop client, then change it."
+Write-Host "The secret file is: $EnvFile"
+Write-Host "Use Start-AlifRetail.ps1 to start later and Stop-AlifRetail.ps1 to stop. Neither script deletes the data volumes."
+) {
+        throw "The existing .env is missing a valid database password, administrator password or owner email."
+    }
+}
+
+# Restrict the credential file to the current Windows user, including on resume.
+$CurrentIdentity = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+& icacls.exe $EnvFile /inheritance:r /grant:r ($CurrentIdentity + ":(R,W)") | Out-Null
+if ($LASTEXITCODE -ne 0) {
+    throw "Could not restrict permissions on deploy/docker/.env."
+}
+
+try {
+    Invoke-Compose @("build", "server")
+    Invoke-Compose @("up", "-d", "postgres")
+    Wait-ForPostgres
+    Invoke-Compose @("--profile", "setup", "run", "--rm", "init")
+    Invoke-Compose @("up", "-d", "server", "cron")
+    Wait-ForServer
+}
+catch {
+    Write-Error "Installation stopped. Existing Docker volumes have not been deleted. Review the Compose logs before retrying."
+    throw
+}
+
+Write-Host ""
+Write-Host "ALIF Retail local services were initialized." -ForegroundColor Green
+Write-Host "Server address: 127.0.0.1:8000"
+Write-Host "Initial administrator: $OwnerEmail"
+Write-Host "Initial administrator password (shown once): $AdminPassword" -ForegroundColor Yellow
+Write-Host "Store this password securely, sign in with the official Tryton 8.0 desktop client, then change it."
+Write-Host "The secret file is: $EnvFile"
+Write-Host "Use Start-AlifRetail.ps1 to start later and Stop-AlifRetail.ps1 to stop. Neither script deletes the data volumes."
+) {
+        throw "Enter a valid owner email address."
+    }
 }
 
 # Start Docker Desktop when installed but not already running.
