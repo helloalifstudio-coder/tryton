@@ -23,6 +23,11 @@ login is not a production acceptance test.
 - [ ] Start script starts PostgreSQL, Tryton and cron before opening the client.
 - [ ] Stop script closes services without deleting PostgreSQL or filestore volumes.
 - [ ] Windows restart preserves all records, attachments and configuration.
+- [ ] Native Tryton client is discovered at its official install path and the
+  launcher opens the configured local database.
+- [ ] Daily Task Scheduler backup runs at the approved after-hours time and
+  logs success/failure under the owner account.
+- [ ] A missed backup caused by shutdown/sign-out runs after the next sign-in.
 - [ ] Core inventory, customer, billing and accounting workflows pass with
   internet disconnected after initial installation.
 - [ ] Docker Desktop unavailable, WSL failure and database-unhealthy cases
