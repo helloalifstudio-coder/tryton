@@ -73,6 +73,27 @@ Stopping services does not delete database or filestore data. Do not use
 docker compose down -v, docker volume prune or Docker Desktop's volume
 cleanup against a live business installation.
 
+## Backups and restore
+
+Create a consistent backup of both PostgreSQL and the Tryton filestore:
+
+    .\deploy\windows\Backup-AlifRetail.ps1
+
+The script briefly stops Tryton writes, creates a timestamped backup folder
+under backups, and records SHA-256 checksums in backup-manifest.json. Copy
+the complete folder to encrypted storage on a separate device.
+
+To restore a backup, first take a separate backup of the current installation,
+then run:
+
+    .\deploy\windows\Restore-AlifRetail.ps1 -BackupFolder ".\backups\20261120T220000Z"
+
+The restore validates both checksums and requires typing RESTORE. It replaces
+the current database and filestore. Keep the application closed during this
+operation and validate login, attachments, stock balances and a test invoice
+before trading again. A successful backup is not proof of a successful
+restore; record a clean restore drill before production use.
+
 ## Offline behaviour
 
 After the first successful installation, normal inventory, customer, billing,
