@@ -97,15 +97,32 @@ if (-not $ServerHealthy) {
 Invoke-Compose @("ps")
 
 if ($LaunchClient) {
-    $Client = Get-Command tryton -ErrorAction SilentlyContinue
-    if (-not $Client) {
-        $Client = Get-Command tryton.exe -ErrorAction SilentlyContinue
+    $ClientCandidates = @(
+        (Join-Path $env:ProgramFiles "Tryton-64bit-8.0/tryton.exe"),
+        (Join-Path $env:ProgramFiles "Tryton-64bit-8.0.10/tryton.exe")
+    )
+    $ClientPath = $ClientCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+    if (-not $ClientPath) {
+        $ClientCommand = Get-Command tryton -ErrorAction SilentlyContinue
+        if (-not $ClientCommand) {
+            $ClientCommand = Get-Command tryton.exe -ErrorAction SilentlyContinue
+        }
+        if ($ClientCommand) {
+            $ClientPath = $ClientCommand.Source
+        }
     }
-    if ($Client) {
-        Start-Process -FilePath $Client.Source
+
+    if ($ClientPath) {
+        $DbNameLine = Get-Content -LiteralPath $EnvFile | Where-Object { $_ -match '^DB_NAME=' } | Select-Object -First 1
+        if (-not $DbNameLine) {
+            throw "DB_NAME was not found in deploy/docker/.env."
+        }
+        $DbName = $DbNameLine.Split("=", 2)[1].Trim()
+        Start-Process -FilePath $ClientPath -ArgumentList ("tryton://127.0.0.1:8000/" + $DbName)
     }
     else {
-        Write-Warning "The Tryton desktop client command was not found. Install the official 8.0 Windows desktop client and connect it to 127.0.0.1:8000."
+        Write-Warning "The Tryton desktop client was not found. Install the official 8.0 Windows client; the server is running at 127.0.0.1:8000."
     }
 }
 
