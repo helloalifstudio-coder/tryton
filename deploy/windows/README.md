@@ -25,6 +25,8 @@ desktop client.
 
 1. Supported 64-bit Windows 10/11 installation with current updates.
 2. Docker Desktop configured to use the WSL 2 backend and Linux containers.
+   Current Docker Desktop guidance requires WSL 2.1.5 or later and at least
+   8 GB RAM for WSL 2; hardware virtualization must be enabled.
 3. The official Tryton 8.0 Windows desktop client, installed separately from
    https://www.tryton.org/download
 4. This repository cloned locally at the alif/production-foundation branch.
