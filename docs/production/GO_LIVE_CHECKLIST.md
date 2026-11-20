@@ -15,7 +15,22 @@ login is not a production acceptance test.
 - [ ] Upstream changes are merged through a reviewed branch, not copied into
   the custom code by hand.
 
-## 2. Apparel catalogue and barcode
+## 2. Single-PC Windows deployment
+
+- [ ] Install on a clean supported Windows 10/11 PC with the WSL 2 Linux engine.
+- [ ] Installer generates unique secrets and refuses to overwrite an existing
+  environment file or database volume.
+- [ ] Start script starts PostgreSQL, Tryton and cron before opening the client.
+- [ ] Stop script closes services without deleting PostgreSQL or filestore volumes.
+- [ ] Windows restart preserves all records, attachments and configuration.
+- [ ] Core inventory, customer, billing and accounting workflows pass with
+  internet disconnected after initial installation.
+- [ ] Docker Desktop unavailable, WSL failure and database-unhealthy cases
+  produce clear recovery instructions.
+- [ ] Desktop client connection and native Windows printer/scanner devices
+  are tested on the actual target PC.
+
+## 3. Apparel catalogue and barcode
 
 - [ ] One garment template can carry brand, collection, department and garment
   type.
@@ -27,7 +42,7 @@ login is not a production acceptance test.
 - [ ] Inactive products cannot be sold accidentally.
 - [ ] Bulk product/variant import is repeatable and reports rejected rows.
 
-## 3. Purchasing and inventory
+## 4. Purchasing and inventory
 
 - [ ] A supplier purchase for multiple sizes/colours receives the correct
   variant quantities.
@@ -38,7 +53,7 @@ login is not a production acceptance test.
 - [ ] Damaged or quarantined stock is unavailable to normal billing.
 - [ ] Stock reports reconcile to posted stock moves and valuation.
 
-## 4. POS and cashier
+## 5. POS and cashier
 
 - [ ] Scanner-based sale works at realistic checkout speed.
 - [ ] Cash, UPI, card and split tenders reconcile to the correct accounts.
@@ -53,7 +68,7 @@ login is not a production acceptance test.
 - [ ] Two or more counters can post sales concurrently without lost stock or
   duplicate document numbers.
 
-## 5. Thermal devices
+## 6. Thermal devices
 
 - [ ] Exact 58 mm and/or 80 mm printer model has been tested.
 - [ ] Paper width, character set, line wrapping, logo and GST fields are correct.
@@ -63,7 +78,7 @@ login is not a production acceptance test.
 - [ ] Reprint queue is auditable and does not duplicate accounting transactions.
 - [ ] Barcode label printer and exact scanner models have been tested.
 
-## 6. Indian tax and accounting
+## 7. Indian tax and accounting
 
 - [ ] CA-approved chart of accounts and journals are configured.
 - [ ] GST registration data, GSTIN and place-of-supply rules are correct.
@@ -75,7 +90,7 @@ login is not a production acceptance test.
 - [ ] E-invoicing/e-way bill applicability is assessed for the taxpayer and
   current turnover/rule thresholds; do not assume it is always required.
 
-## 7. Security and permissions
+## 8. Security and permissions
 
 - [ ] Default credentials have been replaced before live data is entered.
 - [ ] Cashiers cannot edit product cost, tax configuration, accounts or users.
@@ -88,10 +103,14 @@ login is not a production acceptance test.
 - [ ] Remote access uses VPN or a properly configured TLS reverse proxy.
 - [ ] Secrets and backup archives are encrypted and access controlled.
 
-## 8. Data safety, recovery and performance
+## 9. Data safety, recovery and performance
 
-- [ ] Automated database and filestore backups complete.
+- [ ] Scheduled database and filestore backups complete without interrupting
+  active sales; backup logs and retention are monitored.
+- [ ] Every backup contains a matched PostgreSQL dump, filestore archive and
+  verified checksum manifest.
 - [ ] A backup has been restored to a clean test environment successfully.
+- [ ] Windows PowerShell and Linux restore procedures have both been exercised.
 - [ ] Recovery time and acceptable data-loss window are documented.
 - [ ] UPS shutdown and server restart recovery are tested.
 - [ ] A representative 10,000+ variant dataset is loaded.
@@ -101,7 +120,7 @@ login is not a production acceptance test.
   testing.
 - [ ] Database maintenance, log rotation and disk-space alerts are configured.
 
-## 9. Store operations
+## 10. Store operations
 
 - [ ] Staff training and role-specific operating instructions are complete.
 - [ ] Opening, receiving, billing, returns, stock-count and closing procedures
