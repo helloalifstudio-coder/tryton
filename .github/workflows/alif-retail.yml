@@ -11,14 +11,14 @@ on:
       - "scripts/backup-local.sh"
       - "scripts/restore-local.sh"
       - "deploy/windows/**"
-      - "scripts/restore-local.sh"
-      - "deploy/windows/**"
       - ".github/workflows/alif-retail.yml"
   pull_request:
     paths:
       - "modules/alif_retail/**"
       - "deploy/docker/**"
+      - "deploy/windows/**"
       - "scripts/backup-local.sh"
+      - "scripts/restore-local.sh"
       - ".github/workflows/alif-retail.yml"
 
 permissions:
