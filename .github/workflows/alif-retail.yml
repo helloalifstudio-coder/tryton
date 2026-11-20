@@ -9,6 +9,10 @@ on:
       - "modules/alif_retail/**"
       - "deploy/docker/**"
       - "scripts/backup-local.sh"
+      - "scripts/restore-local.sh"
+      - "deploy/windows/**"
+      - "scripts/restore-local.sh"
+      - "deploy/windows/**"
       - ".github/workflows/alif-retail.yml"
   pull_request:
     paths:
@@ -70,6 +74,11 @@ jobs:
           docker compose --env-file deploy/docker/.env.example \
             -f deploy/docker/compose.yml config --quiet
 
+      - name: Validate shell scripts
+        run: |
+          bash -n scripts/backup-local.sh
+          bash -n scripts/restore-local.sh
+
       - name: Build showroom server image
         run: |
           docker build --pull \
@@ -86,3 +95,26 @@ jobs:
           assert "alif_retail" in modules, modules
           print("alif_retail entry point:", modules["alif_retail"])
           '
+
+  windows-launchers:
+    name: Windows launcher syntax
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse PowerShell deployment scripts
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem deploy/windows -Filter *.ps1
+          if ($files.Count -eq 0) { throw "No Windows deployment scripts found." }
+          foreach ($file in $files) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile(
+              $file.FullName, [ref]$tokens, [ref]$errors
+            ) | Out-Null
+            if ($errors.Count -gt 0) {
+              $errors | Format-List | Out-String | Write-Error
+              throw "PowerShell parse failed: $($file.Name)"
+            }
+          }
