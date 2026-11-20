@@ -50,6 +50,23 @@ function Wait-ForPostgres {
     throw "PostgreSQL did not become healthy within three minutes."
 }
 
+function Wait-ForServer {
+    $Deadline = (Get-Date).AddMinutes(3)
+    do {
+        $ContainerId = (& docker compose --env-file $EnvFile -f $ComposeFile ps -q server 2>$null).Trim()
+        if ($LASTEXITCODE -eq 0 -and $ContainerId) {
+            $Health = (& docker inspect --format "{{.State.Health.Status}}" $ContainerId 2>$null).Trim()
+            if ($Health -eq "healthy") {
+                return
+            }
+        }
+        Start-Sleep -Seconds 3
+    } while ((Get-Date) -lt $Deadline)
+
+    Invoke-Compose @("logs", "--tail=100", "server")
+    throw "Tryton server did not become healthy within three minutes."
+}
+
 if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
     throw "Docker CLI was not found. Install Docker Desktop for Windows with the WSL 2 backend, then rerun this installer."
 }
@@ -75,8 +92,12 @@ try {
     $DockerOs = $null
 }
 if ($LASTEXITCODE -ne 0 -or -not $DockerOs) {
-    $DockerDesktop = Join-Path $env:ProgramFiles "Docker/Docker/Docker Desktop.exe"
-    if (-not (Test-Path $DockerDesktop)) {
+    $DockerCandidates = @(
+        (Join-Path $env:ProgramFiles "Docker/Docker/Docker Desktop.exe"),
+        (Join-Path $env:LOCALAPPDATA "Programs/DockerDesktop/Docker Desktop.exe")
+    )
+    $DockerDesktop = $DockerCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+    if (-not $DockerDesktop) {
         throw "Docker Desktop is not installed or the engine is unavailable. Install/start Docker Desktop and enable its WSL 2 Linux engine."
     }
     Start-Process -FilePath $DockerDesktop
@@ -113,12 +134,20 @@ $EnvContent = $EnvContent.Replace(
     $EnvContent,
     (New-Object System.Text.UTF8Encoding($false)))
 
+# Restrict the credential file to the current Windows user.
+$CurrentIdentity = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+& icacls.exe $EnvFile /inheritance:r /grant:r ($CurrentIdentity + ":(R,W)") | Out-Null
+if ($LASTEXITCODE -ne 0) {
+    throw "Could not restrict permissions on deploy/docker/.env."
+}
+
 try {
     Invoke-Compose @("build", "server")
     Invoke-Compose @("up", "-d", "postgres")
     Wait-ForPostgres
     Invoke-Compose @("--profile", "setup", "run", "--rm", "init")
     Invoke-Compose @("up", "-d", "server", "cron")
+    Wait-ForServer
 }
 catch {
     Write-Error "Installation stopped. Existing Docker volumes have not been deleted. Review the Compose logs before retrying."
