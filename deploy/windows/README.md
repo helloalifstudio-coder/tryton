@@ -59,15 +59,24 @@ named in deploy/docker/.env, and change the password immediately.
 
 ## Daily use
 
-Start the local services:
+Start the local services and open the desktop client by double-clicking:
+
+    deploy\windows\Run-ALIF-Retail.cmd
+
+Or run the PowerShell script directly:
 
     .\deploy\windows\Start-AlifRetail.ps1 -LaunchClient
 
-If the desktop client is not on the PATH, start the services without
--LaunchClient, then open Tryton from the Windows Start menu and connect to
-127.0.0.1:8000.
+The launcher waits for PostgreSQL and Tryton health checks before it opens the
+native desktop client. If the desktop client is not installed in the expected
+official path or on PATH, install the official 8.0 Windows client, then start
+it from the Windows Start menu and connect to 127.0.0.1:8000.
 
-Stop the local services after closing the desktop client:
+After closing the desktop client, double-click:
+
+    deploy\windows\Stop-ALIF-Retail.cmd
+
+Or run:
 
     .\deploy\windows\Stop-AlifRetail.ps1
 
