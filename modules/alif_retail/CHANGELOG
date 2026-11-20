@@ -1,0 +1,7 @@
+Alif Retail 8.0.0
+==================
+
+* Initial showroom extension: brand and collection masters.
+* Add apparel department and garment-type fields to product templates.
+* Add fabric composition, fit and care-instruction fields.
+* Use upstream Product Attribute for size and colour variants.

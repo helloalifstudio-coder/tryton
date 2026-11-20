@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling >= 1", "hatch-tryton"]
+build-backend = "hatchling.build"
+
+[project]
+name = "trytond_alif_retail"
+version = "8.0.0"
+description = "Men's and kids' apparel retail extensions for Tryton"
+requires-python = ">=3.10"
+dependencies = [
+    "trytond >=8.0,<8.1",
+    "trytond_company >=8.0,<8.1",
+    "trytond_product >=8.0,<8.1",
+    "trytond_product_attribute >=8.0,<8.1",
+]
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE", "COPYRIGHT"]
+keywords = ["tryton", "retail", "apparel", "inventory", "pos"]
+
+[project.entry-points."trytond.modules"]
+alif_retail = "trytond.modules.alif_retail"
+
+[tool.hatch.build]
+include = [
+    "**/tryton.cfg",
+    "**/*.py",
+    "**/*.xml",
+    "view/**/*.xml",
+    "tests/**/*.py",
+    "README.rst",
+    "LICENSE",
+    "COPYRIGHT",
+    "CHANGELOG",
+]
+exclude = ["doc"]
+
+[tool.hatch.build.targets.wheel.sources]
+"" = "trytond/modules/alif_retail"

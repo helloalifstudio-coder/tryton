@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!-- This file is part of Alif Retail for Tryton. GPL-3.0-or-later. -->
+<form>
+    <label name="code"/>
+    <field name="code"/>
+    <label name="name"/>
+    <field name="name"/>
+    <label name="brand"/>
+    <field name="brand"/>
+    <label name="season"/>
+    <field name="season"/>
+    <label name="start_date"/>
+    <field name="start_date"/>
+    <label name="end_date"/>
+    <field name="end_date"/>
+    <label name="active"/>
+    <field name="active"/>
+</form>

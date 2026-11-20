@@ -1,0 +1,99 @@
+name: alif-showroom
+
+services:
+  postgres:
+    image: ${POSTGRES_IMAGE:-postgres:16-alpine}
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:?Set DB_NAME in deploy/docker/.env}
+      POSTGRES_USER: ${DB_USER:?Set DB_USER in deploy/docker/.env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in deploy/docker/.env}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    security_opt:
+      - no-new-privileges:true
+
+  server:
+    image: ${APP_IMAGE:-alif-showroom:8.0-lts}
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
+      args:
+        TRYTON_BASE_IMAGE: ${TRYTON_BASE_IMAGE:-tryton/tryton:8.0}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOSTNAME: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      PASSWORD: ${TRYTON_ADMIN_PASSWORD}
+      EMAIL: ${TRYTON_ADMIN_EMAIL}
+      TRYTOND_WEB__LISTEN: "0.0.0.0:8000"
+      TRYTOND_DATABASE__LIST: "False"
+    ports:
+      - "${TRYTON_BIND_ADDRESS:-127.0.0.1}:8000:8000"
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import socket; socket.create_connection(('127.0.0.1', 8000), timeout=3).close()"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+    volumes:
+      - tryton-filestore:/var/lib/trytond/db
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  cron:
+    image: ${APP_IMAGE:-alif-showroom:8.0-lts}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOSTNAME: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - tryton-filestore:/var/lib/trytond/db
+    command: ["trytond-cron", "-d", "${DB_NAME}"]
+    security_opt:
+      - no-new-privileges:true
+
+  init:
+    image: ${APP_IMAGE:-alif-showroom:8.0-lts}
+    profiles: ["setup"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOSTNAME: postgres
+      DB_PORT: "5432"
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      PASSWORD: ${TRYTON_ADMIN_PASSWORD}
+      EMAIL: ${TRYTON_ADMIN_EMAIL}
+      TRYTOND_DATABASE__LIST: "False"
+    volumes:
+      - tryton-filestore:/var/lib/trytond/db
+    command: ["trytond-admin", "-d", "${DB_NAME}", "--all"]
+
+volumes:
+  postgres-data:
+  tryton-filestore:

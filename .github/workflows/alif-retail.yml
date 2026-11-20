@@ -1,0 +1,120 @@
+name: Alif Retail module quality
+
+on:
+  push:
+    branches:
+      - "alif/**"
+      - "release/8.0-lts"
+    paths:
+      - "modules/alif_retail/**"
+      - "deploy/docker/**"
+      - "scripts/backup-local.sh"
+      - "scripts/restore-local.sh"
+      - "deploy/windows/**"
+      - ".github/workflows/alif-retail.yml"
+  pull_request:
+    paths:
+      - "modules/alif_retail/**"
+      - "deploy/docker/**"
+      - "deploy/windows/**"
+      - "scripts/backup-local.sh"
+      - "scripts/restore-local.sh"
+      - ".github/workflows/alif-retail.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  module:
+    name: Module tests · Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install module and quality tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install flake8 isort build
+          python -m pip install ./modules/alif_retail
+
+      - name: Lint
+        run: |
+          flake8 modules/alif_retail
+          isort --check --diff modules/alif_retail
+
+      - name: Compile
+        run: python -m compileall -q modules/alif_retail
+
+      - name: Module tests
+        env:
+          TRYTOND_DATABASE__URI: sqlite://
+        run: python -m unittest discover -s modules/alif_retail/tests -p "test*.py"
+
+      - name: Build wheel
+        run: python -m build --wheel modules/alif_retail
+
+  container:
+    name: Local deployment image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate Compose configuration
+        run: |
+          docker compose --env-file deploy/docker/.env.example \
+            -f deploy/docker/compose.yml config --quiet
+
+      - name: Validate shell scripts
+        run: |
+          bash -n scripts/backup-local.sh
+          bash -n scripts/restore-local.sh
+
+      - name: Build showroom server image
+        run: |
+          docker build --pull \
+            --build-arg TRYTON_BASE_IMAGE=tryton/tryton:8.0 \
+            --file deploy/docker/Dockerfile \
+            --tag alif-showroom:ci .
+
+      - name: Verify custom module is registered in the image
+        run: |
+          docker run --rm --entrypoint python3 alif-showroom:ci -c '
+          from importlib.metadata import entry_points
+          modules = {entry.name: entry.value
+                     for entry in entry_points(group="trytond.modules")}
+          assert "alif_retail" in modules, modules
+          print("alif_retail entry point:", modules["alif_retail"])
+          '
+
+  windows-launchers:
+    name: Windows launcher syntax
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse PowerShell deployment scripts
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem deploy/windows -Filter *.ps1
+          if ($files.Count -eq 0) { throw "No Windows deployment scripts found." }
+          foreach ($file in $files) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile(
+              $file.FullName, [ref]$tokens, [ref]$errors
+            ) | Out-Null
+            if ($errors.Count -gt 0) {
+              $errors | Format-List | Out-String | Write-Error
+              throw "PowerShell parse failed: $($file.Name)"
+            }
+          }

@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<!-- This file is part of Alif Retail for Tryton.
+     Copyright (C) 2026 Alif Growth Media. GPL-3.0-or-later. -->
+<tryton>
+    <data>
+        <record model="ir.ui.view" id="brand_view_list">
+            <field name="model">alif.retail.brand</field>
+            <field name="type">tree</field>
+            <field name="name">brand_list</field>
+        </record>
+        <record model="ir.ui.view" id="brand_view_form">
+            <field name="model">alif.retail.brand</field>
+            <field name="type">form</field>
+            <field name="name">brand_form</field>
+        </record>
+        <record model="ir.action.act_window" id="act_brand_form">
+            <field name="name">Brands</field>
+            <field name="res_model">alif.retail.brand</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_brand_list_view">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="brand_view_list"/>
+            <field name="act_window" ref="act_brand_form"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_brand_form_view">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="brand_view_form"/>
+            <field name="act_window" ref="act_brand_form"/>
+        </record>
+        <menuitem
+            parent="product.menu_configuration"
+            action="act_brand_form"
+            sequence="60"
+            id="menu_brand"/>
+
+        <record model="ir.ui.view" id="collection_view_list">
+            <field name="model">alif.retail.collection</field>
+            <field name="type">tree</field>
+            <field name="name">collection_list</field>
+        </record>
+        <record model="ir.ui.view" id="collection_view_form">
+            <field name="model">alif.retail.collection</field>
+            <field name="type">form</field>
+            <field name="name">collection_form</field>
+        </record>
+        <record model="ir.action.act_window" id="act_collection_form">
+            <field name="name">Collections</field>
+            <field name="res_model">alif.retail.collection</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_collection_list_view">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="collection_view_list"/>
+            <field name="act_window" ref="act_collection_form"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_collection_form_view">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="collection_view_form"/>
+            <field name="act_window" ref="act_collection_form"/>
+        </record>
+        <menuitem
+            parent="product.menu_configuration"
+            action="act_collection_form"
+            sequence="70"
+            id="menu_collection"/>
+
+        <record model="ir.model.access" id="access_brand_read">
+            <field name="model">alif.retail.brand</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_brand_admin">
+            <field name="model">alif.retail.brand</field>
+            <field name="group" ref="product.group_product_admin"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+        <record model="ir.model.access" id="access_collection_read">
+            <field name="model">alif.retail.collection</field>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_collection_admin">
+            <field name="model">alif.retail.collection</field>
+            <field name="group" ref="product.group_product_admin"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+        <record model="ir.ui.view" id="template_view_form">
+            <field name="model">product.template</field>
+            <field name="inherit" ref="product.template_view_form"/>
+            <field name="name">template_form</field>
+        </record>
+    </data>
+</tryton>
