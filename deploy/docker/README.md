@@ -85,12 +85,18 @@ window:
 bash scripts/backup-local.sh
 ```
 
-It stops the application and cron briefly, then writes a PostgreSQL custom
-dump, a filestore archive and SHA-256 checksums under `backups/`. These files
-contain sensitive customer and business data. Copy them to encrypted storage
-off the server. Configure a retention policy and perform restore drills before
-the shop depends on the system. The script creates backups; it does not prove
-that a restore works.
+It stops application writes briefly, then writes a PostgreSQL custom dump,
+the Tryton filestore archive and SHA-256 checksums into a timestamped folder
+under backups/. The paired database and filestore are required for recovery.
+Restore with:
+
+    bash scripts/restore-local.sh backups/<timestamp>
+
+The restore script verifies checksums, requires typing RESTORE, replaces the
+database and filestore, then restarts server and cron. Test this procedure on
+a separate clean environment before relying on it. Backup folders contain
+sensitive customer and business data; protect them, copy them to encrypted
+storage off the server, and configure a tested retention policy.
 
 ## Upgrades
 
